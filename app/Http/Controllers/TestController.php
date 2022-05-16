@@ -35,6 +35,14 @@ class TestController extends Controller
         }
 //        Setting locale to the $lang
         App::setLocale($lang);
-        dd(App::getLocale());
+
+//        Getting parameters from Request GET only if they are not null
+//        "lang" is already set and "with" is not going to Meals
+        $parameters = [];
+
+        $data = Meals::readMeals($parameters);
+
+        return response()->json($data);
+
     }
 }
