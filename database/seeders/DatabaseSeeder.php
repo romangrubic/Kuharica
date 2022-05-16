@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
 //            Adding tags and then tags_translations because of tag->id
             TagsSeeder::class,
             TagsTranslationsSeeder::class,
+//            Adding meals and then meals_translations because of meals->id
+            MealsSeeder::class,
+            MealsTranslationsSeeder::class,
         ]);
     }
 }
