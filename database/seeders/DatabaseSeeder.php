@@ -13,6 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+//            Languages table first so DB can pull correct code for translations table
+            LanguagesSeeder::class,
+//            Adding categories and then categories_translations because of category->id
+            CategoriesSeeder::class,
+            CategoriesTranslationsSeeder::class,
+        ]);
     }
 }
