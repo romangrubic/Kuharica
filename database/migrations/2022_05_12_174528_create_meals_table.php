@@ -15,11 +15,12 @@ class CreateMealsTable extends Migration
     {
         Schema::create('meals', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->longText('description');
+            $table->string('title')->nullable();
+            $table->longText('description')->nullable();
             $table->foreignId('category_id')->nullable()->references('id')->on('categories');
             $table->enum('status', ['created', 'modified', 'deleted'])->default('created');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
             $table->softDeletes();
         });
     }
