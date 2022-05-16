@@ -80,7 +80,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -165,7 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        Astrotomic\Translatable\TranslatableServiceProvider::class,
         /*
          * Application Service Providers...
          */
