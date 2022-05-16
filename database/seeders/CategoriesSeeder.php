@@ -23,7 +23,7 @@ class CategoriesSeeder extends Seeder
 
         for ($i = 1; $i <= $count; $i++) {
             DB::table('categories')->insert([
-                'slug' => 'category-'. $i
+                'slug' => 'category-' . $i
             ]);
         }
     }

@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
 //            Adding categories and then categories_translations because of category->id
             CategoriesSeeder::class,
             CategoriesTranslationsSeeder::class,
+//            Adding ingredients and then ingredients_translations because of ingredient->id
+            IngredientsSeeder::class,
+            IngredientsTranslationsSeeder::class,
         ]);
     }
 }

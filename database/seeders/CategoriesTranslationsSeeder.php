@@ -34,7 +34,7 @@ class CategoriesTranslationsSeeder extends Seeder
                 DB::table('categories_translations')->insert([
                     'categories_id' => $category['id'],
                     'locale' => $code,
-                    'title' => $code . ' ' . $faker->text()
+                    'title' => 'Jezik: ' . $code . ' - Naslov kategorije - ' . $category['id'] . ' ' . $faker->text(100)
                 ]);
             }
         }
