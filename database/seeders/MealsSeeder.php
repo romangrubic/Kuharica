@@ -15,8 +15,16 @@ class MealsSeeder extends Seeder
      */
     public function run()
     {
+//        Create 200 meals. Change if you need more
         $count = 200;
-        $countCategory = Categories::all()->count();
+
+        $categoryArray = Categories::all()->toArray();
+
+//        Storing categories ID in an array so that I can pull them in the foreach loop
+        $categoriesId = [];
+        foreach ($categoryArray as $category) {
+            $categoriesId[] = $category['id'];
+        }
 
 //        Some meals don't have to have a category. So we make rand() to determine which one has category
         for ($i = 1; $i <= $count; $i++) {
@@ -29,9 +37,8 @@ class MealsSeeder extends Seeder
             }
 
 //          Otherwise, set category
-            $randomCategory = rand(1, $countCategory);
             DB::table('meals')->insert([
-                'category_id' => $randomCategory,
+                'category_id' => $categoriesId[array_rand($categoriesId)],
             ]);
         }
     }

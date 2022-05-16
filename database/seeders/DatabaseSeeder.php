@@ -28,6 +28,10 @@ class DatabaseSeeder extends Seeder
 //            Adding meals and then meals_translations because of meals->id
             MealsSeeder::class,
             MealsTranslationsSeeder::class,
+//            Creating table for meals_ingredients with at least one ingredient for each meal
+            MealsIngredientsSeeder::class,
+//            Creating table for meals_tags with at least one tag for each meal
+            MealsTagsSeeder::class,
         ]);
     }
 }
