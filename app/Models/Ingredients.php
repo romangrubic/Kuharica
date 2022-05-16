@@ -6,6 +6,7 @@ use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Ingredients extends Model implements TranslatableContract
 {
@@ -21,4 +22,11 @@ class Ingredients extends Model implements TranslatableContract
 
     public $translatedAttributes = ['title'];
     protected $fillable = ['slug'];
+
+    public static function getIngredient($value)
+    {
+        return DB::table('ingredients')
+            ->where('id', '=', $value)
+            ->first();
+    }
 }

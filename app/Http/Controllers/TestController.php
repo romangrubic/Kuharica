@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Models\CategoriesTranslation;
+use App\Models\Ingredients;
+use App\Models\IngredientsTranslation;
 use App\Models\Languages;
 use App\Models\Meals;
+use App\Models\MealsIngredients;
 use App\Models\MealsTags;
 use App\Models\TagsTranslation;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Models\Tags as Tags;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -29,6 +32,18 @@ class TestController extends Controller
 
         $data = Meals::readMeals($parameters);
 
+
+//        Check if there is 'with' in url GET
+        $with = $request->input('with');
+//        If with is null, finish everything and return response to User
+        if ($with == null){
+            return response()->json($data);
+        } else {
+//        Else, calling appendWith() method to append users 'with' input to data
+            $this->appendWith($with, $data);
+        };
+
+
         return response()->json($data);
 
     }
@@ -48,5 +63,50 @@ class TestController extends Controller
         }
 //        Setting locale to the $lang
         App::setLocale($language);
+    }
+
+    private function appendWith($with, $data)
+    {
+        $withList = explode(',', $with);
+//        If 'with' array contains 'category'
+        if (in_array('category', $withList)) {
+            foreach ($data['data'] as $meal) {
+                if ($meal->category_id != null) {
+                    $category = Categories::getCategory($meal->category_id);
+                    $object = CategoriesTranslation::getTitle($category->id);
+                    $category->title = $object->title;
+                    unset($meal->category_id);
+                    $meal->category = $category;
+                }
+            };
+        }
+//        If 'with' array contains 'tags'
+        if (in_array('tags', $withList)) {
+            foreach ($data['data'] as $meal) {
+                $tags = MealsTags::searchByMealId($meal->id);
+                $tagList = [];
+                foreach ($tags as $tag) {
+                    $t = Tags::getTag($tag->tags_id);
+                    $object = TagsTranslation::getTitle($t->id);
+                    $t->title = $object->title;
+                    $tagList[] = $t;
+                }
+                $meal->tags = $tagList;
+            };
+        }
+//        If 'with' array contains 'ingredients'
+        if (in_array('ingredients', $withList)) {
+            foreach ($data['data'] as $meal) {
+                $ingredients = MealsIngredients::searchByMealId($meal->id);
+                $ingredientsList = [];
+                foreach ($ingredients as $ingredient) {
+                    $i = Ingredients::getIngredient($ingredient->ingredients_id);
+                    $object = IngredientsTranslation::getTitle($i->id);
+                    $i->title = $object->title;
+                    $ingredientsList[] = $i;
+                }
+                $meal->ingredients = $ingredientsList;
+            };
+        }
     }
 }
