@@ -28,24 +28,34 @@ class TestController extends Controller
 
 //        Getting parameters from Request GET only if they are not null
 //        "lang" is already set and "with" is not going to Meals
-        $parameters = [];
+//        per_page has to be numeric (one number)
+        $per_page = (int)$request->input('per_page');
+        if ($per_page == null || $per_page == 0) {
+            $per_page = null;
+        }
+
+//        Same with page
+        $page = (int)$request->input('page');
+        if ($page == null || $page == 0) {
+            $page = null; // or one
+        }
+
+
 
         $data = Meals::readMeals($parameters);
 
 
 //        Check if there is 'with' in url GET
-        $with = $request->input('with');
 //        If with is null, finish everything and return response to User
-        if ($with == null){
+        if ($request->input('with') == null){
             return response()->json($data);
         } else {
 //        Else, calling appendWith() method to append users 'with' input to data
-            $this->appendWith($with, $data);
+            $this->appendWith($request->input('with'), $data);
         };
 
-
+//        Return response.
         return response()->json($data);
-
     }
 
     private function validateLanguage($language)
