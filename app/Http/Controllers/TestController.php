@@ -18,6 +18,7 @@ use Astrotomic\Translatable\Translatable;
 use Astrotomic\Translatable\Traits\Relationship;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Route;
 
 class TestController extends Controller
 {
@@ -63,6 +64,24 @@ class TestController extends Controller
 //        Else, calling appendWith() method to append users 'with' input to data
             $this->appendWith($request->input('with'), $data);
         };
+
+//        $this->createRoutes($data, $getParams);
+        $getParams = $request->all();
+        $route = '';
+        foreach ($getParams as $key => $value) {
+            if  ($key == 'page') {
+                continue;
+            }
+            $route .= "&".$key.'='.$value;
+        }
+
+        if (isset($data['links']['prev'])) {
+            $data['links']['prev'] .= $route;
+        }
+        if (isset($data['links']['next'])) {
+            $data['links']['next'] .= $route;
+        }
+        $data['links']['self'] .= '?page=' . $request->input('page') . $route;
 
 //        Return response.
         return response()->json($data);
