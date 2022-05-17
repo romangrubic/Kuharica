@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Support\Facades\Route;
 
 class Meals extends Model
 {
@@ -25,80 +26,47 @@ class Meals extends Model
     public $translatedAttributes = ['title', 'description'];
     protected $fillable = ['slug'];
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tags::class, 'meals_tags', 'meals_id', 'tags_id');
+    }
+
     public static function readMeals($parameters)
     {
-//        Get all meals for testing, later add the parameters
-//        $meals = Meals::query();
-//        $meals->select('id', 'title', 'description', 'status', 'category_id');
-//
-////            ->where('category_id', '=', (isset($parameters['category'])))
-//           $meals->paginate(((isset($parameters['per_page']))?$parameters['per_page']:10),'[*]','page',((isset($parameters['page']))?$parameters['page']:1) );
-
-
-//        if (isset($parameters['per_page']) && is_int($parameters['per_page']) ) {
-//            $meals->paginate($parameters['per_page'])->toArray();
-//        }else{
-//            $meals->paginate(10)->toArray();
-//        };
-//            $meals->get()->toArray();
-
-        $query = DB::table('meals')->select('id', 'title', 'description', 'status', 'category_id');
-//        if ($parameters['category']) {
-//            $query->where('category_id', $parameters['category']);
-//        };
-
-        $query->paginate(((isset($parameters['per_page']))?$parameters['per_page']:10),'[*]','page',((isset($parameters['page']))?$parameters['page']:1))
-        ->toArray();
-
-//        if ($parameters['category'] != null) {
-//            switch ($parameters['category']) {
-//                case('NULL'):
-//                    $meals->where('category_id', 'is', null);
-//                    break;
-//                case('!NULL'):
-//                    $meals->where('category_id', 'is not', null);
-//                    break;
-//                default:
-//                    $meals->where('category_id', '=', $parameters['category']);
-//                    break;
-//            }
-//        }
-//        $categoryOperator = '';
-//        switch ($parameters['category']) {
-//                case('NULL'):
-//                    $categoryOperator = 'is ';
-//                    $parameters['category'] = null;
-//                    break;
-//                case('!NULL'):
-//                    $categoryOperator = 'is not';
-//                    $parameters['category'] = !null;
-//                    break;
-//                default:
-//                    $categoryOperator = '=';
-//                    break;
-//            }
         $meals = DB::table('meals')
             ->select('id', 'title', 'description', 'status', 'category_id')
+//            ->join('meals_tags', 'meals_tags.meals_id', '=', 'meals.id')
             ->where(function ($query) use ($parameters) {
-                if (!isset($parameters['category'])){
+                if (!isset($parameters['category'])) {
                     return;
                 }
                 switch ($parameters['category']) {
-                case('NULL'):
-                    $query->whereNull('category_id');
-                    break;
-                case('!NULL'):
-                    $query->whereNotNull('category_id');
-                    break;
-                default:
-                    $query->where('category_id', '=', $parameters['category']);
-                    break;
+                    case('NULL'):
+                        $query->whereNull('category_id');
+                        break;
+                    case('!NULL'):
+                        $query->whereNotNull('category_id');
+                        break;
+                    default:
+                        $query->where('category_id', '=', $parameters['category']);
+                        break;
                 }
             })
-            ->paginate(((isset($parameters['per_page']))?$parameters['per_page']:10),'[*]','page',((isset($parameters['page']))?$parameters['page']:1))
+//            ->where(function ($query) use ($parameters) {
+//                if (isset($parameters['tags'])) {
+//                    foreach($parameters['tags'] as $tag){
+//                        $query = $query->where('tags_id','=', $tag);
+//                        };
+//                    }
+//            })
+            ->where(function ($query) use ($parameters) {
+                if (isset($parameters['diff_time'])) {
+                    $query = $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                };
+            })
+            ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
             ->toArray();
 
-//        dd($meals);
 //        Get translations and put them in their place
         foreach ($meals['data'] as $meal) {
             $translation = MealsTranslation::getTitleAndDescription($meal->id);
@@ -107,33 +75,34 @@ class Meals extends Model
         }
 
 //        Count for meta['totalItems']
-        $countMeals = count($meals);
+        $countMeals = DB::table('meals')
+            ->select('id', 'title', 'description', 'status', 'category_id')
+            ->where(function ($query) use ($parameters) {
+                if (!isset($parameters['category'])) {
+                    return;
+                }
+                switch ($parameters['category']) {
+                    case('NULL'):
+                        $query->whereNull('category_id');
+                        break;
+                    case('!NULL'):
+                        $query->whereNotNull('category_id');
+                        break;
+                    default:
+                        $query->where('category_id', '=', $parameters['category']);
+                        break;
+                }
+            })
+            ->where(function ($query) use ($parameters) {
+                if (isset($parameters['diff_time'])) {
+                    $query = $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                };
+            })
+            ->get()->count();
 
 //        dd($meals) is showing me tha data I need to mimic the given response from the Task;
 
 //        Formatting meta part
-        $meta = [
-            'currentPage' => $meals['current_page'],
-            'totalItems' => 'Needs refactoring',
-            'itemsPerPage' => (int)$meals['per_page'],
-            'totalPages' => ceil($countMeals/$meals['per_page'])
-        ];
-
-//        Formatting data part
-        $data = $meals['data'];
-
-//        Formatting links part
-        $links = [
-            'prev' => $meals['prev_page_url'],
-            'next' => $meals['next_page_url'],
-            'self' => $meals['path']
-        ];
-
-//        Returning response to controller
-        return [
-            'meta' => $meta,
-            'data' => $data,
-            'links' => $links
-        ];
+        return [$meals, $countMeals];
     }
 }

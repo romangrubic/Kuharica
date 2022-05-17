@@ -55,7 +55,10 @@ class TestController extends Controller
 
         $data = Meals::readMeals($parameters);
 
-// Calling method to create correct url route
+//        Formatting data
+        $data = $this->formatData($data[0], $data[1], $request->all());
+
+//        Calling method to create correct url route
         $data = $this->fullRoute($data, $request->all());
 
 //        Check if there is 'with' in url GET
@@ -70,6 +73,41 @@ class TestController extends Controller
         return response()->json($data);
     }
 
+//    Formatting data to look the same as in task description
+    private function formatData($meals, $countMeals, $getParams)
+    {
+        $totalPages = 0;
+        if ($countMeals != 0 ) {
+            $totalPages = ceil($countMeals/$meals['per_page']);
+        }
+
+//        Formatting meta part
+        $meta = [
+            'currentPage' => $meals['current_page'],
+            'totalItems' => $countMeals,
+            'itemsPerPage' => (int)$meals['per_page'],
+            'totalPages' => $totalPages
+        ];
+
+//        Formatting data part
+        $data = $meals['data'];
+
+//        Formatting links part
+        $links = [
+            'prev' => $meals['prev_page_url'],
+            'next' => $meals['next_page_url'],
+            'self' => $meals['path']
+        ];
+
+//        Returning formatted data
+        return [
+            'meta' => $meta,
+            'data' => $data,
+            'links' => $links
+        ];
+    }
+
+//    Method that creates full length url with get params
     private function fullRoute($data, $getParams)
     {
         $route = '';
@@ -91,6 +129,7 @@ class TestController extends Controller
         return $data;
     }
 
+//    Validating lang from GET param
     private function validateLanguage($language)
     {
 //        Get all languages from DB to check if GET['lang'] exists or not!
