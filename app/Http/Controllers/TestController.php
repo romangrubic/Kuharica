@@ -40,7 +40,20 @@ class TestController extends Controller
             $page = null; // or one
         }
 
+//        Category can only be NULL, !NULL or numeric
+        $category = strtoupper($request->input('category'));
+        if ($category == 'NULL' or $category == '!NULL' or is_numeric($category) ) {
+            $category = strtoupper($request->input('category'));
+        } else {
+            $category = null;
+        }
 
+
+        $parameters = array_filter([
+            'per_page' => $per_page,
+            'page' => $page,
+            'category' => $category,
+        ]);
 
         $data = Meals::readMeals($parameters);
 
