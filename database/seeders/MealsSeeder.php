@@ -26,6 +26,7 @@ class MealsSeeder extends Seeder
             $categoriesId[] = $category['id'];
         }
 
+        DB::beginTransaction();
 //        Some meals don't have to have a category. So we make rand() to determine which one has category
         for ($i = 1; $i <= $count; $i++) {
             $random = rand(0,4);
@@ -41,5 +42,6 @@ class MealsSeeder extends Seeder
                 'category_id' => $categoriesId[array_rand($categoriesId)],
             ]);
         }
+        DB::commit();
     }
 }

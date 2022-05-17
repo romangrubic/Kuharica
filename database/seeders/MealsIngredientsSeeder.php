@@ -25,6 +25,7 @@ class MealsIngredientsSeeder extends Seeder
             $ingredientsId[] = $ingredient['id'];
         }
 
+        DB::beginTransaction();
         foreach ($mealsArray as $meal) {
 //            Every meal has at least 1 ingredient (max 5)
             $randomNumber = rand(1,5);
@@ -36,5 +37,6 @@ class MealsIngredientsSeeder extends Seeder
                 ]);
             }
         }
+        DB::commit();
     }
 }

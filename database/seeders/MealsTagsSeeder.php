@@ -25,6 +25,7 @@ class MealsTagsSeeder extends Seeder
             $tagsId[] = $tag['id'];
         }
 
+        DB::beginTransaction();
         foreach ($mealsArray as $meal) {
 //            Every meal has at least 1 tag (max 5).
             $randomNumber = rand(1,5);
@@ -36,5 +37,6 @@ class MealsTagsSeeder extends Seeder
                 ]);
             }
         }
+        DB::commit();
     }
 }

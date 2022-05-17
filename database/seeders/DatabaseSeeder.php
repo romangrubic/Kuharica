@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        DB::beginTransaction();
         $this->call([
 //            Languages table first so DB can pull correct code for translations table
             LanguagesSeeder::class,
@@ -33,5 +35,7 @@ class DatabaseSeeder extends Seeder
 //            Creating table for meals_tags with at least one tag for each meal
             MealsTagsSeeder::class,
         ]);
+        DB::commit();
+
     }
 }

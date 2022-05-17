@@ -29,6 +29,7 @@ class CategoriesTranslationsSeeder extends Seeder
 
 //      Populating categories_translations with correct category ID and for each language in languages table
 //      title field is being populated by faker
+        DB::beginTransaction();
         foreach ($categoryArray as $category) {
             foreach ($languageCodes as $code) {
                 DB::table('categories_translations')->insert([
@@ -38,5 +39,6 @@ class CategoriesTranslationsSeeder extends Seeder
                 ]);
             }
         }
+        DB::commit();
     }
 }

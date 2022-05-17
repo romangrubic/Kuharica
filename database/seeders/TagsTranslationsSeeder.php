@@ -25,6 +25,7 @@ class TagsTranslationsSeeder extends Seeder
             $languageCodes[] = $language['code'];
         }
 
+        DB::beginTransaction();
         foreach ($tagsArray as $tag) {
             foreach ($languageCodes as $code) {
                 DB::table('tags_translations')->insert([
@@ -34,5 +35,6 @@ class TagsTranslationsSeeder extends Seeder
                 ]);
             }
         }
+        DB::commit();
     }
 }

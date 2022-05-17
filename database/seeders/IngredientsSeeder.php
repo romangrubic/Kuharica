@@ -16,10 +16,12 @@ class IngredientsSeeder extends Seeder
     {
         $count = 100;
 
+        DB::beginTransaction();
         for ($i = 1; $i <= $count; $i++) {
             DB::table('ingredients')->insert([
                 'slug' => 'sastojak-' . $i
             ]);
         }
+        DB::commit();
     }
 }

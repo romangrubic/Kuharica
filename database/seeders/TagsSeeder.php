@@ -16,10 +16,12 @@ class TagsSeeder extends Seeder
     {
         $count = 50;
 
+        DB::beginTransaction();
         for ($i = 1; $i <= $count; $i++) {
             DB::table('tags')->insert([
                 'slug' => 'tag-' . $i
             ]);
         }
+        DB::commit();
     }
 }

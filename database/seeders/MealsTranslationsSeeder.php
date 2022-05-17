@@ -25,6 +25,7 @@ class MealsTranslationsSeeder extends Seeder
             $languageCodes[] = $language['code'];
         }
 
+        DB::beginTransaction();
         foreach ($mealsArray as $meal) {
             foreach ($languageCodes as $code) {
                 DB::table('meals_translations')->insert([
@@ -35,5 +36,6 @@ class MealsTranslationsSeeder extends Seeder
                 ]);
             }
         }
+        DB::commit();
     }
 }

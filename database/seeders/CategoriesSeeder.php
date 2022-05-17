@@ -21,10 +21,12 @@ class CategoriesSeeder extends Seeder
     {
         $count = 20;
 
+        DB::beginTransaction();
         for ($i = 1; $i <= $count; $i++) {
             DB::table('categories')->insert([
                 'slug' => 'category-' . $i
             ]);
         }
+        DB::commit();
     }
 }
