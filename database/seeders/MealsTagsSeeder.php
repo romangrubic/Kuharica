@@ -27,8 +27,8 @@ class MealsTagsSeeder extends Seeder
 
         DB::beginTransaction();
         foreach ($mealsArray as $meal) {
-//            Every meal has at least 1 tag (max 5).
-            $randomNumber = rand(1,5);
+//            Every meal has at least 1 tag (max 4).
+            $randomNumber = rand(1,4);
 
             for ($i = 1; $i <= $randomNumber; $i++) {
                 DB::table('meals_tags')->insert([

@@ -14,7 +14,7 @@ class TagsSeeder extends Seeder
      */
     public function run()
     {
-        $count = 50;
+        $count = 250;
 
         DB::beginTransaction();
         for ($i = 1; $i <= $count; $i++) {

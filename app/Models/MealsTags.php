@@ -25,4 +25,11 @@ class MealsTags extends Model
             ->get()
             ->toArray();
     }
+
+    public static function getMealsWithTags($tag)
+    {
+        return DB::table('meals_tags')
+            ->select('meals_id')
+            ->where('tags_id', '=', $tag)->get()->toArray();
+    }
 }

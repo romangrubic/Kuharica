@@ -15,8 +15,8 @@ class MealsSeeder extends Seeder
      */
     public function run()
     {
-//        Create 200 meals. Change if you need more
-        $count = 200;
+//        Create 500 meals. Change if you need more
+        $count = 500;
 
         $categoryArray = Categories::all()->toArray();
 
