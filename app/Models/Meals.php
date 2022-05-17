@@ -35,7 +35,7 @@ class Meals extends Model
     {
 //       If there is tags list in GET params, $multiple array contains all meals that have those tags
         $multiple = Meals::getArray($parameters);
-        
+
         $meals = DB::table('meals')
             ->select('meals.id', 'title', 'description', 'status', 'category_id')
             ->where(function ($query) use ($parameters) {
@@ -61,7 +61,7 @@ class Meals extends Model
             })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
-                    $query = $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                    $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
                 };
             })
             ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
@@ -81,7 +81,7 @@ class Meals extends Model
         return [$meals, $countMeals];
     }
 
-//        Forgive me for this. For the love of God, I couldn't find a way to do this in query builder.
+//        For the love of God, I couldn't find a way to do this in query builder.
 //        So I made this. Pretty ugly but working.
     public static function getArray($parameters)
     {

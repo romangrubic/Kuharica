@@ -89,10 +89,9 @@ class TestController extends Controller
         if ($this->request->input('with') == null){
             return response()->json($data);
         }
-//        Else, calling appendWith() method to append users 'with' input to data
+//        Else, calling appendWith() method to append users 'with' input to data and return response
         $this->appendWith($this->request->input('with'), $data);
 
-//        Return response.
         return response()->json($data);
     }
 
@@ -147,7 +146,7 @@ class TestController extends Controller
         if (isset($data['links']['next'])) {
             $data['links']['next'] .= $route;
         }
-        $data['links']['self'] .= '?page=' . $getParams['page'] . $route;
+        $data['links']['self'] .= '?page=' . $this->request->input('page') . $route;
 
         return $data;
     }
