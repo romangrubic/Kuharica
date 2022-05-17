@@ -22,27 +22,49 @@ use Illuminate\Support\Facades\Route;
 
 class TestController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * The meals repository implementation.
+     *
+     * @var Meals
+     */
+    protected $meals;
+
+//    Instance of request
+    protected $request;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param  Meals  $meals
+     * @return void
+     */
+    public function __construct(Meals $meals, Request $request)
+    {
+        $this->meals = $meals;
+        $this->request = $request;
+    }
+
+    public function index()
     {
 //        Validate function for language, default 'en'
-        $this->validateLanguage($request->input('lang'));
+        $this->validateLanguage($this->request->input('lang'));
 
 //        Getting parameters from Request GET
 //        "lang" is already set and "with" is not going to Meals
 //        per_page has to be numeric (one number)
-        $per_page = $this->validatePerPage((int)$request->input('per_page'));
+        $per_page = $this->validatePerPage((int)$this->request->input('per_page'));
 
 //        Same with page
-        $page = $this->validatePage((int)$request->input('page'));
+        $page = $this->validatePage((int)$this->request->input('page'));
 
 //        Category can only be NULL, !NULL or numeric
-        $category = $this->validateCategory(strtoupper($request->input('category')));
+        $category = $this->validateCategory(strtoupper($this->request->input('category')));
 
 //        Check that tag array contains only numbers and removes string from it!
-        $tags = $this->validateTags($request->input('tags'));
+        $tags = $this->validateTags($this->request->input('tags'));
 
 //        Diff time greater than 0
-        $diff_time = $this->validateDiffTime($request->input('diff_time'));
+        $diff_time = $this->validateDiffTime($this->request->input('diff_time'));
 
 //        Populating $parameters array
         $parameters = array_filter([
@@ -53,28 +75,29 @@ class TestController extends Controller
             'diff_time' => $diff_time,
         ]);
 
-        $data = Meals::readMeals($parameters);
+//        Getting data from the query
+        $data = $this->meals::readMeals($parameters);
 
 //        Formatting data
-        $data = $this->formatData($data[0], $data[1], $request->all());
+        $data = $this->formatData($data[0], $data[1]);
 
-//        Calling method to create correct url route
-        $data = $this->fullRoute($data, $request->all());
+//        Calling method to format correct url routes for prev, next and self
+        $data = $this->fullRoute($data, $this->request->all());
 
 //        Check if there is 'with' in url GET
 //        If with is null, finish everything and return response to User
-        if ($request->input('with') == null){
+        if ($this->request->input('with') == null){
             return response()->json($data);
         }
 //        Else, calling appendWith() method to append users 'with' input to data
-        $this->appendWith($request->input('with'), $data);
+        $this->appendWith($this->request->input('with'), $data);
 
 //        Return response.
         return response()->json($data);
     }
 
 //    Formatting data to look the same as in task description
-    private function formatData($meals, $countMeals, $getParams)
+    private function formatData($meals, $countMeals)
     {
         $totalPages = 0;
         if ($countMeals != 0 ) {
