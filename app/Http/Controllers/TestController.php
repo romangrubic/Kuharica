@@ -26,40 +26,24 @@ class TestController extends Controller
 //        Validate function for language, default 'en'
         $this->validateLanguage($request->input('lang'));
 
-//        Getting parameters from Request GET only if they are not null
+//        Getting parameters from Request GET
 //        "lang" is already set and "with" is not going to Meals
 //        per_page has to be numeric (one number)
-        $per_page = (int)$request->input('per_page');
-        if ($per_page == null || $per_page == 0) {
-            $per_page = null;
-        }
+        $per_page = $this->validatePerPage((int)$request->input('per_page'));
 
 //        Same with page
-        $page = (int)$request->input('page');
-        if ($page == null || $page == 0) {
-            $page = null; // or one
-        }
+        $page = $this->validatePage((int)$request->input('page'));
 
 //        Category can only be NULL, !NULL or numeric
-        $category = strtoupper($request->input('category'));
-        if ($category == 'NULL' or $category == '!NULL' or is_numeric($category) ) {
-            $category = strtoupper($request->input('category'));
-        } else {
-            $category = null;
-        }
+        $category = $this->validateCategory(strtoupper($request->input('category')));
 
 //        Check that tag array contains only numbers and removes string from it!
-        $tags = array_filter(explode(',',$request->input('tags')));
-        foreach ($tags as $tag) {
-            if ((int)$tag == 0) {
-                if (($key = array_search($tag, $tags)) !== false) {
-                    unset($tags[$key]);
-                }
-            }
-        }
+        $tags = $this->validateTags($request->input('tags'));
 
-        $diff_time = $request->input('diff_time');
+//        Diff time greater than 0
+        $diff_time = $this->validateDiffTime($request->input('diff_time'));
 
+//        Populating $parameters array
         $parameters = array_filter([
             'per_page' => $per_page,
             'page' => $page,
@@ -101,6 +85,59 @@ class TestController extends Controller
         App::setLocale($language);
     }
 
+//    per_page validation. Number greater than 0
+    private function validatePerPage($input)
+    {
+        if ($input == null || $input == 0) {
+            return null;
+        }
+        return $input;
+    }
+
+//    page validation. Number greater than 0
+    private function validatePage($input)
+    {
+        if ($input == null || $input == 0) {
+            return null;
+        }
+        return $input;
+
+    }
+
+//    category validation. Can be 'NULL', '!NULL' and number (id)
+    private function validateCategory($input)
+    {
+        if ($input == 'NULL' or $input == '!NULL' or is_numeric($input) ) {
+            return $input;
+        } else {
+            return null;
+        }
+    }
+
+//    tags validation. Takes whole input and takes only numbers. Strings are omitted.
+    private function validateTags($input)
+    {
+        $tags = array_filter(explode(',',$input));
+        foreach ($tags as $tag) {
+            if ((int)$tag == 0) {
+                if (($key = array_search($tag, $tags)) !== false) {
+                    unset($tags[$key]);
+                }
+            }
+        }
+        return $tags;
+    }
+
+//    diff_time has to be greater than 0
+    private function validateDiffTime($input)
+    {
+        if ($input < 0) {
+            return null;
+        }
+        return $input;
+    }
+
+//    Takes with parameter and appends desired data
     private function appendWith($with, $data)
     {
         $withList = explode(',', $with);
