@@ -55,18 +55,23 @@ class TestController extends Controller
 
         $data = Meals::readMeals($parameters);
 
+// Calling method to create correct url route
+        $data = $this->fullRoute($data, $request->all());
 
 //        Check if there is 'with' in url GET
 //        If with is null, finish everything and return response to User
         if ($request->input('with') == null){
             return response()->json($data);
-        } else {
+        }
 //        Else, calling appendWith() method to append users 'with' input to data
-            $this->appendWith($request->input('with'), $data);
-        };
+        $this->appendWith($request->input('with'), $data);
 
-//        $this->createRoutes($data, $getParams);
-        $getParams = $request->all();
+//        Return response.
+        return response()->json($data);
+    }
+
+    private function fullRoute($data, $getParams)
+    {
         $route = '';
         foreach ($getParams as $key => $value) {
             if  ($key == 'page') {
@@ -81,10 +86,9 @@ class TestController extends Controller
         if (isset($data['links']['next'])) {
             $data['links']['next'] .= $route;
         }
-        $data['links']['self'] .= '?page=' . $request->input('page') . $route;
+        $data['links']['self'] .= '?page=' . $getParams['page'] . $route;
 
-//        Return response.
-        return response()->json($data);
+        return $data;
     }
 
     private function validateLanguage($language)
