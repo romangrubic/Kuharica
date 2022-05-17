@@ -48,11 +48,24 @@ class TestController extends Controller
             $category = null;
         }
 
+//        Check that tag array contains only numbers and removes string from it!
+        $tags = array_filter(explode(',',$request->input('tags')));
+        foreach ($tags as $tag) {
+            if ((int)$tag == 0) {
+                if (($key = array_search($tag, $tags)) !== false) {
+                    unset($tags[$key]);
+                }
+            }
+        }
+
+        $diff_time = $request->input('diff_time');
 
         $parameters = array_filter([
             'per_page' => $per_page,
             'page' => $page,
             'category' => $category,
+            'tags' => $tags,
+            'diff_time' => $diff_time,
         ]);
 
         $data = Meals::readMeals($parameters);
