@@ -28,14 +28,16 @@ class Meals extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tags::class, 'meals_tags', 'meals_id', 'tags_id');
+        return $this->hasManyThrough(Tags::class, MealsTags::class, 'meals_id', 'tags_id');
     }
 
     public static function readMeals($parameters)
     {
+//       If there is tags list in GET params, $multiple array contains all meals that have those tags
+        $multiple = Meals::getArray($parameters);
+        
         $meals = DB::table('meals')
-            ->select('id', 'title', 'description', 'status', 'category_id')
-//            ->join('meals_tags', 'meals_tags.meals_id', '=', 'meals.id')
+            ->select('meals.id', 'title', 'description', 'status', 'category_id')
             ->where(function ($query) use ($parameters) {
                 if (!isset($parameters['category'])) {
                     return;
@@ -52,13 +54,11 @@ class Meals extends Model
                         break;
                 }
             })
-//            ->where(function ($query) use ($parameters) {
-//                if (isset($parameters['tags'])) {
-//                    foreach($parameters['tags'] as $tag){
-//                        $query = $query->where('tags_id','=', $tag);
-//                        };
-//                    }
-//            })
+            ->where(function ($query) use ($parameters, $multiple) {
+                if (isset($parameters['tags'])) {
+                    $query->whereIn('id', $multiple);
+                }
+            })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
                     $query = $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
@@ -74,35 +74,38 @@ class Meals extends Model
             $meal->description = $translation->description;
         }
 
-//        Count for meta['totalItems']
-        $countMeals = DB::table('meals')
-            ->select('id', 'title', 'description', 'status', 'category_id')
-            ->where(function ($query) use ($parameters) {
-                if (!isset($parameters['category'])) {
-                    return;
-                }
-                switch ($parameters['category']) {
-                    case('NULL'):
-                        $query->whereNull('category_id');
-                        break;
-                    case('!NULL'):
-                        $query->whereNotNull('category_id');
-                        break;
-                    default:
-                        $query->where('category_id', '=', $parameters['category']);
-                        break;
-                }
-            })
-            ->where(function ($query) use ($parameters) {
-                if (isset($parameters['diff_time'])) {
-                    $query = $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
-                };
-            })
-            ->get()->count();
+//        Count for meta['totalItems'].
+//        From dd($meals)->total is not showing correct number of meals, so I had to make another query
+        $countMeals = $meals['total'];
 
-//        dd($meals) is showing me tha data I need to mimic the given response from the Task;
-
-//        Formatting meta part
         return [$meals, $countMeals];
+    }
+
+//        Forgive me for this. For the love of God, I couldn't find a way to do this in query builder.
+//        So I made this. Pretty ugly but working.
+    public static function getArray($parameters)
+    {
+        $multiple = [];
+        if (isset($parameters['tags'])) {
+            $array = [];
+            $count = 0;
+            foreach ($parameters['tags'] as $tag) {
+                $o = MealsTags::getMealsWithTags($tag);
+                $count++;
+                foreach ($o as $ok) {
+                    foreach ($ok as $k => $v) {
+                        $array[] = $v;
+                    }
+                }
+            }
+            $newArray = (array_count_values($array));
+
+            foreach ($newArray as $k => $v) {
+                if ($v >= $count ) {
+                    $multiple[] = $k;
+                }
+            }
+        }
+        return $multiple;
     }
 }
