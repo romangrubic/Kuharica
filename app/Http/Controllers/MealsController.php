@@ -13,20 +13,12 @@ use App\Models\MealsTags;
 use App\Models\Tags;
 use App\Models\TagsTranslation;
 use Illuminate\Http\Request;
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
-use Astrotomic\Translatable\Traits\Relationship;
 use Illuminate\Support\Facades\App;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Route;
 
 class MealsController extends Controller
 {
-    /**
-     * The meals repository implementation.
-     *
-     * @var Meals
-     */
+
+//    For dependency injection
     protected $meals;
     protected $request;
     protected $languages;
@@ -73,13 +65,13 @@ class MealsController extends Controller
         $this->ingredientsTranslation = $ingredientsTranslation;
     }
 
+//    Main method
     public function index()
     {
 //        Validate function for language, default 'en'
         $this->validateLanguage($this->request->input('lang'));
 
 //        Getting parameters from Request GET
-//        "lang" is already set and "with" is not going to Meals
 //        per_page has to be numeric (one number)
         $per_page = $this->validatePerPage((int)$this->request->input('per_page'));
 
@@ -96,6 +88,7 @@ class MealsController extends Controller
         $diff_time = $this->validateDiffTime($this->request->input('diff_time'));
 
 //        Populating $parameters array
+//        "lang" is already set and "with" is not going to Meals
         $parameters = array_filter([
             'per_page' => $per_page,
             'page' => $page,

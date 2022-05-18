@@ -36,6 +36,7 @@ class Meals extends Model
 //       If there is tags list in GET params, $multiple array contains all meals that have those tags
         $multiple = Meals::getArray($parameters);
 
+//        Main query
         $meals = DB::table('meals')
             ->select('meals.id', 'title', 'description', 'status', 'category_id')
             ->where(function ($query) use ($parameters) {
@@ -81,7 +82,6 @@ class Meals extends Model
         }
 
 //        Count for meta['totalItems'].
-//        From dd($meals)->total is not showing correct number of meals, so I had to make another query
         $countMeals = $meals['total'];
 
         return [$meals, $countMeals];
