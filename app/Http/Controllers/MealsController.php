@@ -10,9 +10,9 @@ use App\Models\Languages;
 use App\Models\Meals;
 use App\Models\MealsIngredients;
 use App\Models\MealsTags;
+use App\Models\Tags;
 use App\Models\TagsTranslation;
 use Illuminate\Http\Request;
-use App\Models\Tags as Tags;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Astrotomic\Translatable\Traits\Relationship;
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
 
-class TestController extends Controller
+class MealsController extends Controller
 {
     /**
      * The meals repository implementation.
@@ -28,9 +28,17 @@ class TestController extends Controller
      * @var Meals
      */
     protected $meals;
-
-//    Instance of request
     protected $request;
+    protected $languages;
+    protected $app;
+    protected $categories;
+    protected $categoriesTranslation;
+    protected $mealsTags;
+    protected $tags;
+    protected $tagsTranslation;
+    protected $mealsIngredients;
+    protected $ingredients;
+    protected $ingredientsTranslation;
 
     /**
      * Create a new controller instance.
@@ -38,10 +46,31 @@ class TestController extends Controller
      * @param  Meals  $meals
      * @return void
      */
-    public function __construct(Meals $meals, Request $request)
+    public function __construct(Meals $meals,
+                                Request $request,
+                                Languages $languages,
+                                App $app,
+                                Categories $categories,
+                                CategoriesTranslation $categoriesTranslation,
+                                MealsTags $mealsTags,
+                                Tags $tags,
+                                TagsTranslation $tagsTranslation,
+                                MealsIngredients $mealsIngredients,
+                                Ingredients $ingredients,
+                                IngredientsTranslation $ingredientsTranslation)
     {
         $this->meals = $meals;
         $this->request = $request;
+        $this->languages = $languages;
+        $this->app = $app;
+        $this->categories = $categories;
+        $this->categoriesTranslation = $categoriesTranslation;
+        $this->mealsTags = $mealsTags;
+        $this->tags = $tags;
+        $this->tagsTranslation = $tagsTranslation;
+        $this->mealsIngredients = $mealsIngredients;
+        $this->ingredients = $ingredients;
+        $this->ingredientsTranslation = $ingredientsTranslation;
     }
 
     public function index()
@@ -155,7 +184,7 @@ class TestController extends Controller
     private function validateLanguage($language)
     {
 //        Get all languages from DB to check if GET['lang'] exists or not!
-        $codes = Languages::readCode();
+        $codes = $this->languages::readCode();
 //        Putting code values in array codeList to perform check
         $codeList = [];
         foreach ($codes as $code) {
@@ -166,7 +195,7 @@ class TestController extends Controller
             $language = 'en';
         }
 //        Setting locale to the $lang
-        App::setLocale($language);
+        $this->app::setLocale($language);
     }
 
 //    per_page validation. Number greater than 0
@@ -229,8 +258,8 @@ class TestController extends Controller
         if (in_array('category', $withList)) {
             foreach ($data['data'] as $meal) {
                 if ($meal->category_id != null) {
-                    $category = Categories::getCategory($meal->category_id);
-                    $object = CategoriesTranslation::getTitle($category->id);
+                    $category = $this->categories::getCategory($meal->category_id);
+                    $object = $this->categoriesTranslation::getTitle($category->id);
                     $category->title = $object->title;
                     unset($meal->category_id);
                     $meal->category = $category;
@@ -240,11 +269,11 @@ class TestController extends Controller
 //        If 'with' array contains 'tags'
         if (in_array('tags', $withList)) {
             foreach ($data['data'] as $meal) {
-                $tags = MealsTags::searchByMealId($meal->id);
+                $tags = $this->mealsTags::searchByMealId($meal->id);
                 $tagList = [];
                 foreach ($tags as $tag) {
-                    $t = Tags::getTag($tag->tags_id);
-                    $object = TagsTranslation::getTitle($t->id);
+                    $t = $this->tags::getTag($tag->tags_id);
+                    $object = $this->tagsTranslation::getTitle($t->id);
                     $t->title = $object->title;
                     $tagList[] = $t;
                 }
@@ -254,11 +283,11 @@ class TestController extends Controller
 //        If 'with' array contains 'ingredients'
         if (in_array('ingredients', $withList)) {
             foreach ($data['data'] as $meal) {
-                $ingredients = MealsIngredients::searchByMealId($meal->id);
+                $ingredients = $this->mealsIngredients::searchByMealId($meal->id);
                 $ingredientsList = [];
                 foreach ($ingredients as $ingredient) {
-                    $i = Ingredients::getIngredient($ingredient->ingredients_id);
-                    $object = IngredientsTranslation::getTitle($i->id);
+                    $i = $this->ingredients::getIngredient($ingredient->ingredients_id);
+                    $object = $this->ingredientsTranslation::getTitle($i->id);
                     $i->title = $object->title;
                     $ingredientsList[] = $i;
                 }
