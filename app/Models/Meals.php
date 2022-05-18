@@ -39,6 +39,11 @@ class Meals extends Model
         $meals = DB::table('meals')
             ->select('meals.id', 'title', 'description', 'status', 'category_id')
             ->where(function ($query) use ($parameters) {
+                if (!isset($parameters['diff_time'])) {
+                    $query->where('status', '=', 'created');
+                }
+            })
+            ->where(function ($query) use ($parameters) {
                 if (!isset($parameters['category'])) {
                     return;
                 }
@@ -61,7 +66,8 @@ class Meals extends Model
             })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
-                    $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                    $query->whereDate('deleted_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']))
+                    ->orWhereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
                 };
             })
             ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
