@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MealsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,6 +11,3 @@ use App\Http\Controllers\MealsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/meals', [MealsController::class, 'index']);
-
