@@ -26,19 +26,32 @@ class Meals extends Model
     public $translatedAttributes = ['title', 'description'];
     protected $fillable = ['slug'];
 
-    public function tags()
+    public function mealstags()
     {
-        return $this->hasManyThrough(Tags::class, MealsTags::class, 'meals_id', 'tags_id');
+        return $this->belongsToMany('App\Models\Tags', 'meals_tags', 'meals_id', 'tags_id');
     }
 
     public static function readMeals($parameters)
     {
-//       If there is tags list in GET params, $multiple array contains all meals that have those tags
-        $multiple = Meals::getArray($parameters);
+//        dd($parameters['tags']);
+//        $tags = implode(', ', $parameters['tags']);
+//        dd($tags);
+
+//        SELECT  m.*
+//        FROM    meals m
+//        WHERE   EXISTS  (
+//                    SELECT  1
+//                    FROM    meals_tags t
+//                    WHERE   m.id = t.meals_id
+//                    AND     t.tags_id IN (227,25)
+//                    HAVING COUNT(1) = 2
+//                );
+
 
 //        Main query
         $meals = DB::table('meals')
-            ->select('meals.id', 'title', 'description', 'status', 'category_id')
+            ->select('id', 'title', 'description', 'status', 'category_id')
+//            ->join('meals_tags', 'meals_tags.meals_id', '=', 'meals.id', 'inner')
             ->where(function ($query) use ($parameters) {
                 if (!isset($parameters['diff_time'])) {
                     $query->where('status', '=', 'created');
@@ -60,19 +73,24 @@ class Meals extends Model
                         break;
                 }
             })
-            ->where(function ($query) use ($parameters, $multiple) {
-                if (isset($parameters['tags'])) {
-                    $query->whereIn('id', $multiple);
-                }
-            })
+//            ->whereExists(function ($query) use ($parameters) {
+//                if (isset($parameters['tags'])) {
+//                    $query->select(DB::raw(1))
+//                        ->from('meals_tags')
+//                        ->where('meals.id', '=', 'meals_tags.meals_id')
+//                        ->whereIn('meals_tags.tags_id', $parameters['tags'])
+//                        ->having(DB::raw('COUNT(1)'), '=', count($parameters['tags']));
+//                        }
+//                })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
                     $query->whereDate('deleted_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']))
-                    ->orWhereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                        ->orWhereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
                 };
             })
             ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
             ->toArray();
+
 
 //        Get translations and put them in their place
         foreach ($meals['data'] as $meal) {
