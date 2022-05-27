@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\App;
 class LanguageRule implements Rule
 {
     protected array $languages;
+
     /**
      * Create a new rule instance.
      *

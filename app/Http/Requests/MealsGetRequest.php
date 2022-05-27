@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Languages;
+
 use App\Rules\LanguageRule;
 use Illuminate\Foundation\Http\FormRequest;
 
