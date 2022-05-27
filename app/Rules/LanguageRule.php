@@ -14,9 +14,9 @@ class LanguageRule implements Rule
      *
      * @return void
      */
-    public function __construct($languages)
+    public function __construct()
     {
-        $this->languages = $languages;
+        $this->languages = Languages::readCode();
     }
 
     /**
@@ -24,9 +24,9 @@ class LanguageRule implements Rule
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @return void
+     * @return bool
      */
-    public function passes($attribute, $value): void
+    public function passes($attribute, $value): bool
     {
 //        Get all languages from DB to check if GET['lang'] exists or not!
 //        Putting code values in array codeList to perform check
@@ -35,11 +35,15 @@ class LanguageRule implements Rule
             $codeList[] = $code->code;
         }
 //        Check if $lang in array. If not, default to 'en' -> English
+//        Currently, throw an error.
         if (!in_array($value, $codeList)) {
-            $value = 'en';
+//            $value = 'en';
+            return false;
         }
-//        Setting locale to the $lang
+//        dd(App::getLocale());
+//        Setting locale to the $lang and return true
         App::setLocale($value);
+        return true;
     }
 
     /**

@@ -50,7 +50,7 @@ class MealsGetRequest extends FormRequest
             ],
             'lang'  => [
                 'required',
-                new LanguageRule(Languages::readCode())
+                new LanguageRule()
             ],
             'diff_time' => [
                 'regex:/^\d{10}$/'
