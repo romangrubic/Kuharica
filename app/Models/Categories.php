@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\HasMany};
+use Illuminate\Support\Facades\{
+    App,
+    DB
+};
 
-class Categories extends Model implements TranslatableContract
+class Categories extends Model
 {
     use HasFactory;
-    use Translatable;
 
     /**
      * The table associated with the model.
@@ -19,12 +21,16 @@ class Categories extends Model implements TranslatableContract
      * @var string
      */
     protected $table = 'categories';
-
-    public $translatedAttributes = ['title'];
+    protected $with = ['categoriesTranslations'];
     protected $fillable = ['slug'];
 
-    public static function getCategory($value)
+    public function meals(): HasMany
     {
-        return DB::table('categories')->first();
+        return $this->hasMany(Meals::class);
+    }
+
+    public function categoriesTranslations(): HasMany
+    {
+        return $this->hasMany(CategoriesTranslation::class)->where('locale', '=', App::getLocale());
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\BelongsTo};
 
 class CategoriesTranslation extends Model
 {
@@ -17,16 +17,11 @@ class CategoriesTranslation extends Model
      * @var string
      */
     protected $table = 'categories_translations';
-
     public $timestamps = false;
     protected $fillable = ['title'];
 
-    public static function getTitle($categoryId)
+    public function categories(): BelongsTo
     {
-        return DB::table('categories_translations')
-            ->select('title')
-            ->where('categories_id', '=', $categoryId)
-            ->where('locale', '=', App::getLocale())
-            ->first();
+        return $this->belongsTo(Categories::class);
     }
 }
