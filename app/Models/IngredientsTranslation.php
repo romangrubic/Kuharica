@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\BelongsTo
+};
 
 class IngredientsTranslation extends Model
 {
@@ -17,16 +18,11 @@ class IngredientsTranslation extends Model
      * @var string
      */
     protected $table = 'ingredients_translations';
-
     public $timestamps = false;
     protected $fillable = ['title'];
 
-    public static function getTitle($ingredientId)
+    public function ingredients(): BelongsTo
     {
-        return DB::table('ingredients_translations')
-            ->select('title')
-            ->where('ingredients_id', '=', $ingredientId)
-            ->where('locale', '=', App::getLocale())
-            ->first();
+        return $this->belongsTo(Ingredients::class);
     }
 }

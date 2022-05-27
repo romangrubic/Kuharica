@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\BelongsToMany,
+    Relations\HasMany
+};
+use Illuminate\Support\Facades\App;
 
-class Ingredients extends Model implements TranslatableContract
+class Ingredients extends Model
 {
     use HasFactory;
-    use Translatable;
 
     /**
      * The table associated with the model.
@@ -19,14 +20,16 @@ class Ingredients extends Model implements TranslatableContract
      * @var string
      */
     protected $table = 'ingredients';
-
-    public $translatedAttributes = ['title'];
+    protected $with = ['ingredientsTranslations'];
     protected $fillable = ['slug'];
 
-    public static function getIngredient($value)
+    public function meals(): BelongsToMany
     {
-        return DB::table('ingredients')
-            ->where('id', '=', $value)
-            ->first();
+        return $this->belongsToMany(Meals::class, 'meals_tags', 'ingredients_id', 'meals_id');
+    }
+
+    public function ingredientsTranslations(): HasMany
+    {
+        return $this->hasMany(IngredientsTranslation::class)->where('locale', '=', App::getLocale());
     }
 }
