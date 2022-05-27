@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\BelongsToMany,
+    Relations\HasMany
+};
+use Illuminate\Support\Facades\App;
 
-class Tags extends Model implements TranslatableContract
+class Tags extends Model
 {
     use HasFactory;
-    use Translatable;
 
     /**
      * The table associated with the model.
@@ -21,13 +21,27 @@ class Tags extends Model implements TranslatableContract
      */
     protected $table = 'tags';
 
-    public $translatedAttributes = ['title'];
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['tagsTranslations'];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['slug'];
 
-    public static function getTag($value)
+    public function meals(): BelongsToMany
     {
-        return DB::table('tags')
-            ->where('id', '=', $value)
-            ->first();
+        return $this->belongsToMany(Meals::class, 'meals_tags', 'tags_id', 'meals_id');
+    }
+
+    public function tagsTranslations(): HasMany
+    {
+        return $this->hasMany(TagsTranslation::class)->where('locale', '=', App::getLocale());
     }
 }

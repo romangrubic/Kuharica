@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Model,
+    Relations\BelongsTo
+};
 
 class TagsTranslation extends Model
 {
@@ -18,15 +19,15 @@ class TagsTranslation extends Model
      */
     protected $table = 'tags_translations';
 
-    public $timestamps = false;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['title'];
 
-    public static function getTitle($tagId)
+    public function tags(): BelongsTo
     {
-        return DB::table('tags_translations')
-            ->select('title')
-            ->where('tags_id', '=', $tagId)
-            ->where('locale', '=', App::getLocale())
-            ->first();
+        return $this->belongsTo(Tags::class);
     }
 }
