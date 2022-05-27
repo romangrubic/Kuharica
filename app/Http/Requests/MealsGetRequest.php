@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CategoryRule;
+use App\Models\Languages;
+use App\Rules\LanguageRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MealsGetRequest extends FormRequest
@@ -40,13 +41,20 @@ class MealsGetRequest extends FormRequest
             'category' => [
                 'regex:/^(?:[1-9][0-9]*|NULL|!NULL)$/'
             ],
-
-
-//            'lang'  => [
-//                'required',
-//                'string',
-//                'size:2'
-//            ],
+//            String with numbers only with comma separator between (no comma after last number)
+            'tags' => [
+                'regex:/^\d+(?:,\d+)*$/'
+            ],
+            'with' => [
+                'regex:/^\b(tags|ingredients|category)\b/'
+            ],
+            'lang'  => [
+                'required',
+                new LanguageRule(Languages::readCode())
+            ],
+            'diff_time' => [
+                'regex:/^\d{10}$/'
+            ]
         ];
     }
 
@@ -59,7 +67,7 @@ class MealsGetRequest extends FormRequest
     {
         $this->merge([
             'per_page' => $this->per_page ?? 10,
-            'page' => $this->per_page ?? 1,
+            'page' => $this->page ?? 1,
         ]);
     }
 
@@ -71,7 +79,7 @@ class MealsGetRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'per_page.integer' => 'A title is required',
+//            'per_page.integer' => 'A title is required',
 //            'body.required' => 'A message is required',
         ];
     }
