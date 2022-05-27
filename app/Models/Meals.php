@@ -1,14 +1,23 @@
 <?php
 
+/**
+ * This file contains model for Meals table.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Database\Eloquent\{Factories\HasFactory,
+    Model,
+    Relations\BelongsTo,
+    Relations\HasMany,
+    SoftDeletes,
+    Relations\BelongsToMany};
+use Illuminate\Support\Facades\{App,
+    DB};
+
+/**
+ * Meals is a model class for meals table.
+ */
 
 class Meals extends Model
 {
@@ -22,16 +31,31 @@ class Meals extends Model
      * @var string
      */
     protected $table = 'meals';
-
-    public $translatedAttributes = ['title', 'description'];
+    protected $with = ['meals_translations'];
     protected $fillable = ['slug'];
 
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tags::class, 'meals_tags', 'meals_id', 'tags_id');
     }
 
-    public static function readMeals($parameters)
+    public function ingredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredients::class, 'meals_ingredients', 'meals_id', 'ingredients_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Categories::class);
+    }
+
+    public function meals_translations(): HasMany
+    {
+        return $this->hasMany(MealsTranslation::class)->where('locale', '=', App::getLocale());
+    }
+
+//    For future me: whole point of readMeals is to get list of Id-s so that I can pass it to MealController eloqeunt query
+    public static function readMeals($parameters): array
     {
 //        dd($parameters);
 //        $tags = implode(', ', $parameters['tags']);
@@ -50,7 +74,7 @@ class Meals extends Model
 
 //        Main query
         $meals = DB::table('meals')
-            ->select('*')
+            ->select('id')
 //            ->join('meals_tags', 'meals_tags.meals_id', '=', 'meals.id', 'inner')
             ->where(function ($query) use ($parameters) {
                 if (!isset($parameters['diff_time'])) {
@@ -85,29 +109,26 @@ class Meals extends Model
 //                })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
-                    $query->whereDate('deleted_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']))
-                        ->orWhereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                    $query->whereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
                 };
             })
             ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
             ->toArray();
 
-
+        return $meals;
 //        Get translations and put them in their place
         foreach ($meals['data'] as $meal) {
             if (!isset($parameters['diff_time'])) {
                 $meal->status = 'created';
             } else {
 //                dd($meal);
-                if ($meal->deleted_at != null) {
-                    $meal->status = 'deleted';
-                    continue;
-                }
-
                 if ($meal->created_at == $meal->updated_at) {
                     $meal->status = 'created';
                 } else {
                     $meal->status = 'modified';
+                }
+                if ($meal->deleted_at != null) {
+                    $meal->status = 'deleted';
                 }
             }
             $translation = MealsTranslation::getTitleAndDescription($meal->id);
@@ -123,7 +144,7 @@ class Meals extends Model
 
 //        For the love of God, I couldn't find a way to do this in query builder.
 //        So I made this. Pretty ugly but working.
-    public static function getArray($parameters)
+    public static function getArray($parameters): array
     {
         $multiple = [];
         if (isset($parameters['tags'])) {

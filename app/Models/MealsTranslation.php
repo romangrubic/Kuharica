@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{Factories\HasFactory,
+    Model,
+    Relations\BelongsTo};
 
 class MealsTranslation extends Model
 {
@@ -17,17 +16,10 @@ class MealsTranslation extends Model
      * @var string
      */
     protected $table = 'meals_translations';
-
-    public $timestamps = false;
     protected $fillable = ['title', 'description'];
 
-//    Get correct translation for given meal id and the locale!
-    public static function getTitleAndDescription($mealId)
+    public function meals(): BelongsTo
     {
-        return DB::table('meals_translations')
-            ->select('title', 'description')
-            ->where('meals_id', '=', $mealId)
-            ->where('locale', '=', App::getLocale())
-            ->first();
+        return $this->belongsTo(Meals::class);
     }
 }
