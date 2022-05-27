@@ -26,14 +26,14 @@ class Meals extends Model
     public $translatedAttributes = ['title', 'description'];
     protected $fillable = ['slug'];
 
-    public function mealstags()
+    public function tags()
     {
-        return $this->belongsToMany('App\Models\Tags', 'meals_tags', 'meals_id', 'tags_id');
+        return $this->belongsToMany(Tags::class, 'meals_tags', 'meals_id', 'tags_id');
     }
 
     public static function readMeals($parameters)
     {
-//        dd($parameters['tags']);
+//        dd($parameters);
 //        $tags = implode(', ', $parameters['tags']);
 //        dd($tags);
 
@@ -50,11 +50,11 @@ class Meals extends Model
 
 //        Main query
         $meals = DB::table('meals')
-            ->select('id', 'title', 'description', 'status', 'category_id')
+            ->select('*')
 //            ->join('meals_tags', 'meals_tags.meals_id', '=', 'meals.id', 'inner')
             ->where(function ($query) use ($parameters) {
                 if (!isset($parameters['diff_time'])) {
-                    $query->where('status', '=', 'created');
+                    $query->where('deleted_at', '=', null);
                 }
             })
             ->where(function ($query) use ($parameters) {
@@ -77,6 +77,7 @@ class Meals extends Model
 //                if (isset($parameters['tags'])) {
 //                    $query->select(DB::raw(1))
 //                        ->from('meals_tags')
+////                        ->join('meals', 'meals.id', '=', 'meals_tags.meals_id', 'inner')
 //                        ->where('meals.id', '=', 'meals_tags.meals_id')
 //                        ->whereIn('meals_tags.tags_id', $parameters['tags'])
 //                        ->having(DB::raw('COUNT(1)'), '=', count($parameters['tags']));
@@ -94,6 +95,21 @@ class Meals extends Model
 
 //        Get translations and put them in their place
         foreach ($meals['data'] as $meal) {
+            if (!isset($parameters['diff_time'])) {
+                $meal->status = 'created';
+            } else {
+//                dd($meal);
+                if ($meal->deleted_at != null) {
+                    $meal->status = 'deleted';
+                    continue;
+                }
+
+                if ($meal->created_at == $meal->updated_at) {
+                    $meal->status = 'created';
+                } else {
+                    $meal->status = 'modified';
+                }
+            }
             $translation = MealsTranslation::getTitleAndDescription($meal->id);
             $meal->title = $translation->title;
             $meal->description = $translation->description;
