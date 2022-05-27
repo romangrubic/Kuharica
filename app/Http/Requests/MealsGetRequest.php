@@ -36,8 +36,9 @@ class MealsGetRequest extends FormRequest
                 'numeric',
                 'min:1'
             ],
+//            No leading 0 or just 0
             'category' => [
-                'regex:/^(?:\d+|NULL|!NULL)$/'
+                'regex:/^(?:[1-9][0-9]*|NULL|!NULL)$/'
             ],
 
 
