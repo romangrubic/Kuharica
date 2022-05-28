@@ -11,8 +11,8 @@ class MealsController extends Controller
 {
 
 //    For dependency injection
-    protected $meals;
-    protected $request;
+    protected Meals $meals;
+    protected MealsGetRequest $request;
 
     /**
      * Create a new controller instance.
@@ -30,11 +30,8 @@ class MealsController extends Controller
 //    Main method
     public function index(): JsonResponse
     {
-        $parameters = [];
-        foreach ($this->request->validated() as $k => $v) {
-            $parameters += [$k => $v];
-        }
-//        dd($parameters);
+        $parameters = $this->request->validated();
+        
         $array = $this->meals::readMeals($parameters);
         $newList = [];
 //        dd($array);
@@ -44,7 +41,20 @@ class MealsController extends Controller
             }
         }
 //        dd($newList);
-        $data = $this->meals::with(['tags', 'ingredients', 'category'])->whereIn('id', $newList)->get()->toArray();
+//        $data = getData($parameters);
+//        $data = $this->meals::whereIn('id', $newList)->get()->toArray();
+
+        if (isset($parameters['with']) && isset($parameters['diff_time'])) {
+            $withList = explode(',', $parameters['with']);
+            $data = $this->meals::with($withList)->whereIn('id', $newList)->withTrashed()->get()->toArray();
+        } elseif (isset($parameters['with'])){
+            $withList = explode(',', $parameters['with']);
+            $data = $this->meals::with($withList)->whereIn('id', $newList)->get()->toArray();
+        } elseif (isset($parameters['diff_time'])){
+            $data = $this->meals::whereIn('id', $newList)->withTrashed()->get()->toArray();
+        } else {
+            $data = $this->meals::whereIn('id', $newList)->get()->toArray();
+        };
 
         return response()->json($data);
 
