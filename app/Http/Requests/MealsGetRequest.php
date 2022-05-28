@@ -25,6 +25,8 @@ class MealsGetRequest extends FormRequest
      */
     public function rules(): array
     {
+        $this->redirect = 'api/meals?lang=en';
+
         return [
 //            https://laravel.com/docs/9.x/validation#rule-integer combine with numeric
             'per_page' => [
@@ -46,7 +48,8 @@ class MealsGetRequest extends FormRequest
                 'regex:/^\d+(?:,\d+)*$/'
             ],
             'with' => [
-                'regex:/^\b(tags|ingredients|category)\b/'
+//                One of those words repeated 1-3 times with comma separation (no space after)
+                'regex:/^(tags|ingredients|category)(?:,(tags|ingredients|category)){0,2}$/'
             ],
             'lang'  => [
                 'required',
