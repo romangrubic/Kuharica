@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\{Factories\HasFactory,
     Model,
     Relations\BelongsTo,
@@ -109,7 +110,8 @@ class Meals extends Model
 //                })
             ->where(function ($query) use ($parameters) {
                 if (isset($parameters['diff_time'])) {
-                    $query->whereDate('updated_at', '>=', date('Y-m-d H:i:s', $parameters['diff_time']));
+                    $timestamp = Carbon::createFromTimestamp($parameters['diff_time']);
+                    $query->where('updated_at', '>=', $timestamp);
                 };
             })
             ->paginate(((isset($parameters['per_page'])) ? $parameters['per_page'] : 10), '[*]', 'page', ((isset($parameters['page'])) ? $parameters['page'] : 1))
