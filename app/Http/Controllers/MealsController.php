@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MealsGetRequest;
+use App\Http\Resources\MealsCollection;
+use App\Http\Resources\MealsResource;
 use App\Models\Meals;
 use Illuminate\Http\JsonResponse;
 
 
 class MealsController extends Controller
 {
-
 //    For dependency injection
     protected Meals $meals;
     protected MealsGetRequest $request;
@@ -31,31 +32,39 @@ class MealsController extends Controller
     public function index(): JsonResponse
     {
         $parameters = $this->request->validated();
-        
-        $array = $this->meals::readMeals($parameters);
-        $newList = [];
+
+//        dd($this->meals::readMeals($parameters));
+        $data = $this->meals::readMeals($parameters);
+//        $newList = [];
 //        dd($array);
-        foreach ($array['data'] as $o) {
-            foreach ($o as $k => $v) {
-                $newList[] = $v;
-            }
-        }
+//        foreach ($array['data'] as $o) {
+//            foreach ($o as $k => $v) {
+//                if ($k == 'id') {
+//                    $newList[] = $v;
+//                }
+//            }
+//        }
 //        dd($newList);
 //        $data = getData($parameters);
 //        $data = $this->meals::whereIn('id', $newList)->get()->toArray();
 
-        if (isset($parameters['with']) && isset($parameters['diff_time'])) {
-            $withList = explode(',', $parameters['with']);
-            $data = $this->meals::with($withList)->whereIn('id', $newList)->withTrashed()->get()->toArray();
-        } elseif (isset($parameters['with'])){
-            $withList = explode(',', $parameters['with']);
-            $data = $this->meals::with($withList)->whereIn('id', $newList)->get()->toArray();
-        } elseif (isset($parameters['diff_time'])){
-            $data = $this->meals::whereIn('id', $newList)->withTrashed()->get()->toArray();
-        } else {
-            $data = $this->meals::whereIn('id', $newList)->get()->toArray();
-        };
+//        if (isset($parameters['with']) && isset($parameters['diff_time'])) {
+//            $withList = explode(',', $parameters['with']);
+////            If I leave protected $with in meals model than it gets called twice instead of once
+////            So I am adding it here
+//            $withList[] = 'meals_translations';
+//            $data = $this->meals::withTrashed()->with($withList)->whereIn('id', $newList)->get();
+//        } elseif (isset($parameters['with'])) {
+//            $withList = explode(',', $parameters['with']);
+//            $withList[] = 'meals_translations';
+//            $data = $this->meals::with($withList)->whereIn('id', $newList)->get();
+//        } elseif (isset($parameters['diff_time'])) {
+//            $data = $this->meals::withTrashed()->whereIn('id', $newList)->get();
+//        } else {
+//            $data = $this->meals::whereIn('id', $newList)->get();
+//        };
 
+//        Sending through MealsCollection (resource)
         return response()->json($data);
 
 //        Getting data from the query
