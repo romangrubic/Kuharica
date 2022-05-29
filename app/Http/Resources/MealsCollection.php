@@ -2,22 +2,24 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\MealsGetRequest;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Collection;
-
-
 
 class MealsCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
      *
-     * @param  Request  $request
-     * @return Collection
+     * @param  MealsGetRequest  $request
+     * @return array
      */
     public function toArray($request)
     {
-        return $this->collection;
+
+//        dd($this->resource->toArray());
+//        dd($request->input());
+        return [
+            'data' => $this->collection,
+            ];
     }
 }

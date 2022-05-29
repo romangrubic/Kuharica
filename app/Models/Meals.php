@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\{Factories\HasFactory,
     Relations\HasMany,
     SoftDeletes,
     Relations\BelongsToMany};
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
 
 /**
@@ -54,7 +55,7 @@ class Meals extends Model
         return $this->hasMany(MealsTranslation::class)->where('locale', '=', App::getLocale());
     }
 
-    public static function readMeals($parameters): array
+    public static function readMeals($parameters): LengthAwarePaginator
     {
             return Meals::select('*')
                 ->when(isset($parameters['category']), function ($query) use ($parameters) {
@@ -84,10 +85,9 @@ class Meals extends Model
                 })
                 ->when(isset($parameters['diff_time']), function ($query) use ($parameters) {
                     $timestamp = Carbon::createFromTimestamp($parameters['diff_time']);
-                    $query->where('meals.updated_at', '>=', $timestamp);
-                    $query->withTrashed();
-                    })
-                ->paginate($parameters['per_page'], '[*]', 'page', $parameters['page'])
-                ->toArray();
+                    $query->where('meals.updated_at', '>=', $timestamp)
+                        ->withTrashed();
+                })
+                ->paginate($parameters['per_page'], '[*]', 'page', $parameters['page']);
     }
 }

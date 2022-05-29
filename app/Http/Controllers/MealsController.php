@@ -65,7 +65,7 @@ class MealsController extends Controller
 //        };
 
 //        Sending through MealsCollection (resource)
-        return response()->json(new MealsCollection($data['data']));
+        return response()->json(new MealsCollection($data));
 
 //        Getting data from the query
         $data = $this->meals::readMeals($parameters);
