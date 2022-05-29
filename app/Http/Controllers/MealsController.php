@@ -36,7 +36,7 @@ class MealsController extends Controller
 //        dd($this->meals::readMeals($parameters));
         $data = $this->meals::readMeals($parameters);
 //        $newList = [];
-//        dd($array);
+//        dd($data);
 //        foreach ($array['data'] as $o) {
 //            foreach ($o as $k => $v) {
 //                if ($k == 'id') {
@@ -65,7 +65,7 @@ class MealsController extends Controller
 //        };
 
 //        Sending through MealsCollection (resource)
-        return response()->json($data);
+        return response()->json(new MealsCollection($data['data']));
 
 //        Getting data from the query
         $data = $this->meals::readMeals($parameters);
