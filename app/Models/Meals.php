@@ -53,7 +53,7 @@ class Meals extends Model
     {
         return $this->hasMany(MealsTranslation::class)->where('locale', '=', App::getLocale());
     }
-    
+
     public static function readMeals($parameters): array
     {
             return Meals::select('*')
