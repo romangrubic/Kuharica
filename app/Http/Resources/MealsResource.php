@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Http\Requests\MealsGetRequest;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MealsResource extends JsonResource
@@ -23,20 +24,23 @@ class MealsResource extends JsonResource
             'category' => $this->helperCategory($request['with']),
         ];
 
-        $tags = $this->helperTagAndIngredient($request, 'tags');
-        if ($tags) {
-            $meal['tags'] = $tags;
-        }
-
-        $ingredients = $this->helperTagAndIngredient($request, 'ingredients');
-        if ($ingredients) {
-            $meal['ingredients'] = $ingredients;
+        foreach (['tags', 'ingredients'] as $item) {
+            $data = $this->helperWithData($request, $item);
+            if ($data) {
+                $meal[$item] = $data;
+            }
         }
 
         return $meal;
     }
 
-    private function helperStatus($param): string
+    /**
+     * Sets 'status' key with correct status type (created|modified|deleted)
+     *
+     * @param string $param
+     * @return string
+     */
+    private function helperStatus(string $param): string
     {
         if (!isset($param)) {
             return 'created';
@@ -53,7 +57,13 @@ class MealsResource extends JsonResource
         }
     }
 
-    private function helperCategory($param)
+    /**
+     * Sets 'category' key with category data
+     *
+     * @param string $param
+     * @return array|mixed
+     */
+    private function helperCategory(string $param): mixed
     {
         if (!in_array('category', explode(',', $param))) {
             return $this->resource['category_id'];
@@ -63,8 +73,6 @@ class MealsResource extends JsonResource
             return $this->resource['category_id'];
         }
 
-//        $getTitle = $this->resource['category']->toArray();
-//        dd($getTitle['categories_translations'][0]['title']);
         return [
             'id' => $this->resource['category']['id'],
             'title' => $this->resource['category']->toArray()['categories_translations'][0]['title'],
@@ -72,20 +80,26 @@ class MealsResource extends JsonResource
         ];
     }
 
-    private function helperTagAndIngredient($request, string $key)
+    /**
+     * Sets keys 'tags' and 'ingredients' if they are set in GET 'with' parameter
+     *
+     * @param Request $request
+     * @param string $key
+     * @return array|bool
+     * if I write type array|bool next to function, it throws a syntax error
+     */
+    private function helperWithData(Request $request, string $key)
     {
         if (in_array($key, explode(',', $request->input('with')))) {
-            $keysList = [];
-            $keys = [];
+            $dataList = [];
             foreach ($this->resource[$key] as $item) {
-                $keys['id'] = $item->id;
-                $keys['title'] = $item->toArray()[$key . '_translations'][0]['title'];
-                $keys['slug'] = $item->slug;
+                $data['id'] = $item->id;
+                $data['title'] = $item->toArray()[$key . '_translations'][0]['title'];
+                $data['slug'] = $item->slug;
 
-                $keysList[] = $keys;
-                $keys = [];
+                $dataList[] = $data;
             }
-            return $keysList;
+            return $dataList;
         };
         return false;
     }
