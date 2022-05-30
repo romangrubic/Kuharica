@@ -1,21 +1,29 @@
 <?php
 
+/**
+ * This file contains seeder class for meals_translations table.
+ */
+
 namespace Database\Seeders;
 
-use App\Models\Languages;
-use App\Models\Meals;
+use App\Models\{Languages,
+    Meals};
 use Faker\Generator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * MealsTranslationsSeeder is a seeder class for meals_translations table.
+ */
 class MealsTranslationsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the meals_translations seeds.
      *
+     * @param Generator $faker
      * @return void
      */
-    public function run(Generator $faker)
+    public function run(Generator $faker): void
     {
         $mealsArray = Meals::all()->toArray();
         $languageArray = Languages::all()->toArray();

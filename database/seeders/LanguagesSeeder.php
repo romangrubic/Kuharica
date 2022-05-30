@@ -1,20 +1,29 @@
 <?php
 
+/**
+ * This file contains seeder class for languages table.
+ */
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * LanguagesSeeder is a seeder class for languages table.
+ */
 class LanguagesSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the languages seeds.
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
-//        If more languages are needed, just add another array in data.
+        /**
+         * If more languages are needed, just add another array in data.
+         */
         $data = [
             ['language' => 'Hrvatski',
                 'code' => 'hr'],
@@ -34,6 +43,5 @@ class LanguagesSeeder extends Seeder
                 'code' => $d['code'],
             ]);
         }
-
     }
 }

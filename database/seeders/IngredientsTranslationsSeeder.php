@@ -1,21 +1,29 @@
 <?php
 
+/**
+ * This file contains seeder class for ingredients_translation table.
+ */
+
 namespace Database\Seeders;
 
-use App\Models\Ingredients;
-use App\Models\Languages;
+use App\Models\{Ingredients,
+    Languages};
 use Faker\Generator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * IngredientsTranslationsSeeder is a seeder class for ingredients_translation table.
+ */
 class IngredientsTranslationsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the ingredients_translation seeds.
      *
+     * @param Generator $faker
      * @return void
      */
-    public function run(Generator $faker)
+    public function run(Generator $faker): void
     {
         $ingredientsArray = Ingredients::all()->toArray();
         $languageArray = Languages::all()->toArray();
