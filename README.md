@@ -17,16 +17,17 @@ Any issues, send PM and I'll sort it out.
   * [Custom URL response](#example-for-custom-url-response)
 
 
-
+---
 ## Base URL
 
 Base route looks like this
 
-> localhost/api/meals?lang=en  
+    Example: localhost/api/meals?lang=en
 
 And can be complex as this
 
-> localhost/api/meals?lang=en&per_page=5&with=ingredients,category,tags&page=1&tags=2,175
+    Example: localhost/api/meals?lang=en&per_page=5&with=ingredients,category,tags&page=1&tags=2,175
+
 
 ### Required GET parameters:
 - lang 
@@ -38,7 +39,9 @@ And can be complex as this
     3. German (Deutsch) - 'de'
     4. Italian (Italiana) - 'it'
     5. Spanish (Española) - 'es'
-    > localhost/api/meals?lang=en
+    
+
+    Example: localhost/api/meals?lang=en
 
 ### Optional GET parameters:
 - per_page
@@ -46,14 +49,18 @@ And can be complex as this
   - Anything else resets url back to base url
   - Default value is 5
   - Determines how many meals are shown per page
-    > localhost/api/meals?lang=en&per_page=10
+  
+
+    Example: localhost/api/meals?lang=en&per_page=10
     
 - page
   - INT (greater than 0) 
   - Anything else resets url back to base url
   - Default value is 1 (default per_page is 5)
   - Determines which page is shown to user
-    > localhost/api/meals?lang=en&page=3
+  
+
+    Example: localhost/api/meals?lang=en&page=3
     
 - category
   - INT (greater than zero) | NULL | !NULL (case-sensitive)
@@ -62,13 +69,17 @@ And can be complex as this
     - NULL shows all meals that don't have category
     - !NULL shows all meals that have a category (where value is not null)
     - INT shows meals with selected category
-    > localhost/api/meals?lang=en&category=!NULL
+
+
+    Example: localhost/api/meals?lang=en&category=!NULL
     
 - tags
   - String of integers with comma separation (no space after comma and no trailing comma)
   - Anything else resets url back to base url
   - Selects meals that have all tags required (no partial, all of them)
-    > localhost/api/meals?lang=en&tags=23,176
+  
+  
+    Example: localhost/api/meals?lang=en&tags=23,176
   
 - with
   - String of with up to three times (category|tags|ingredients) with comma separation (no space after comma)
@@ -76,22 +87,26 @@ And can be complex as this
   - Selects extra data for selected
     - category - shows extra data such as title and slug
     - tags - shows extra data such as id, title and slug
-    - ingredients - shows extra data such as id, title and slug
-    > localhost/api/meals?lang=en&with=category,tags,ingredients
+    - ingredients - shows extra data such as id, title and slug 
+    
+    
+    Example: localhost/api/meals?lang=en&with=category,tags,ingredients
 
 - diff_time
   - UNIX timestamp (integer greater than 0)
   - Anything else resets url back to base url 
   - Returns all meals that have been modified (including deleted) after the UNIX timestamp
   - Shows current status of the meal (create|modified|deleted)
-    > localhost/api/meals?lang=en&diff_time=1234567890
+
+
+    Example: localhost/api/meals?lang=en&diff_time=1234567890
 
 
 ## Response example
 
 ### Example for base url response
 
-> localhost/api/meals?lang=en
+    URL: localhost/api/meals?lang=en
 
 ```yaml
 {
@@ -182,7 +197,7 @@ And can be complex as this
 ```
 ### Example for custom url response
 
-> localhost/api/meals?per_page=5&tags=2&lang=hr&with=ingredients,category,tags&diff_time=1493902343&page=2
+    URL: localhost/api/meals?per_page=5&tags=2&lang=hr&with=ingredients,category,tags&diff_time=1493902343&page=2
 
 ```yaml
 {
