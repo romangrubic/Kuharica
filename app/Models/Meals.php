@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains model for Meals table.
+ * This file contains model for meals table.
  */
 
 namespace App\Models;
@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\App;
 /**
  * Meals is a model class for meals table.
  */
-
 class Meals extends Model
 {
     use HasFactory;
@@ -32,30 +31,70 @@ class Meals extends Model
      * @var string
      */
     protected $table = 'meals';
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
     protected $with = ['meals_translations'];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['slug'];
 
+    /**
+     * Relation with Tags model.
+     *
+     * @return BelongsToMany
+     */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tags::class, 'meals_tags', 'meals_id', 'tags_id');
     }
 
+    /**
+     * Relation with Ingredients model.
+     *
+     * @return BelongsToMany
+     */
     public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredients::class, 'meals_ingredients', 'meals_id', 'ingredients_id');
     }
 
+    /**
+     * Relation with Categories model.
+     *
+     * @return BelongsTo
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Categories::class);
     }
 
+    /**
+     * Relation with MealsTranslation model.
+     *
+     * @return HasMany
+     */
     public function meals_translations(): HasMany
     {
         return $this->hasMany(MealsTranslation::class)->where('locale', '=', App::getLocale());
     }
 
-    public static function readMeals($parameters): LengthAwarePaginator
+    /**
+     * Main method for searching meals.
+     * Takes parameters from GET request and adds where clauses to query when requested parameter is set.
+     * Returns LengthAwarePaginator so that I can access paginate stuff in MealsCollection.
+     *
+     * @param array $parameters
+     * @return LengthAwarePaginator
+     */
+    public static function readMeals(array $parameters): LengthAwarePaginator
     {
             return Meals::select('*')
                 ->when(isset($parameters['category']), function ($query) use ($parameters) {

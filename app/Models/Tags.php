@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file contains model for tags table.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{
@@ -10,6 +14,9 @@ use Illuminate\Database\Eloquent\{
 };
 use Illuminate\Support\Facades\App;
 
+/**
+ * Meals is a model class for meals table.
+ */
 class Tags extends Model
 {
     use HasFactory;
@@ -35,11 +42,21 @@ class Tags extends Model
      */
     protected $fillable = ['slug'];
 
+    /**
+     * Relation with Meals model.
+     *
+     * @return BelongsToMany
+     */
     public function meals(): BelongsToMany
     {
         return $this->belongsToMany(Meals::class, 'meals_tags', 'tags_id', 'meals_id');
     }
 
+    /**
+     * Relation with TagsTranslation model.
+     *
+     * @return HasMany
+     */
     public function tagsTranslations(): HasMany
     {
         return $this->hasMany(TagsTranslation::class)->where('locale', '=', App::getLocale());

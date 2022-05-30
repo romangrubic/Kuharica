@@ -1,11 +1,17 @@
 <?php
 
+/**
+ * This file contains model for meals_tags table.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{Factories\HasFactory,
+    Model};
 
+/**
+ * MealsTags is a model class for meals_tags table.
+ */
 class MealsTags extends Model
 {
     use HasFactory;
@@ -16,20 +22,4 @@ class MealsTags extends Model
      * @var string
      */
     protected $table = 'meals_tags';
-
-    public static function searchByMealId($value)
-    {
-        return DB::table('meals_tags')
-            ->select('tags_id')
-            ->where('meals_id', '=', $value)
-            ->get()
-            ->toArray();
-    }
-
-    public static function getMealsWithTags($tag)
-    {
-        return DB::table('meals_tags')
-            ->select('meals_id')
-            ->where('tags_id', '=', $tag)->get()->toArray();
-    }
 }

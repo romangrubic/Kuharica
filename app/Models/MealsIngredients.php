@@ -1,11 +1,17 @@
 <?php
 
+/**
+ * This file contains model for meals_ingredients table.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\{Factories\HasFactory,
+    Model};
 
+/**
+ * MealsIngredients is a model class for meals_ingredients table.
+ */
 class MealsIngredients extends Model
 {
     use HasFactory;
@@ -16,13 +22,4 @@ class MealsIngredients extends Model
      * @var string
      */
     protected $table = 'meals_ingredients';
-
-    public static function searchByMealId($value)
-    {
-        return DB::table('meals_ingredients')
-            ->select('ingredients_id')
-            ->where('meals_id', '=', $value)
-            ->get()
-            ->toArray();
-    }
 }

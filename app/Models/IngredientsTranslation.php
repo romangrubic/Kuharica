@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file contains model for ingredients_translations table.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{
@@ -8,6 +12,9 @@ use Illuminate\Database\Eloquent\{
     Relations\BelongsTo
 };
 
+/**
+ * IngredientsTranslation is a model class for ingredients_translations table.
+ */
 class IngredientsTranslation extends Model
 {
     use HasFactory;
@@ -18,9 +25,19 @@ class IngredientsTranslation extends Model
      * @var string
      */
     protected $table = 'ingredients_translations';
-    public $timestamps = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['title'];
 
+    /**
+     * Relation with Ingredients model.
+     *
+     * @return BelongsTo
+     */
     public function ingredients(): BelongsTo
     {
         return $this->belongsTo(Ingredients::class);

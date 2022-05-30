@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file contains model for categories_translations table.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{
@@ -7,6 +11,9 @@ use Illuminate\Database\Eloquent\{
     Model,
     Relations\BelongsTo};
 
+/**
+ * CategoriesTranslation is a model class for categories_translations table.
+ */
 class CategoriesTranslation extends Model
 {
     use HasFactory;
@@ -17,9 +24,19 @@ class CategoriesTranslation extends Model
      * @var string
      */
     protected $table = 'categories_translations';
-    public $timestamps = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['title'];
 
+    /**
+     * Relation with Categories model.
+     *
+     * @return BelongsTo
+     */
     public function categories(): BelongsTo
     {
         return $this->belongsTo(Categories::class);

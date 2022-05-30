@@ -1,13 +1,18 @@
 <?php
 
+/**
+ * This file contains model for tags_translation table.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\{
-    Factories\HasFactory,
+use Illuminate\Database\Eloquent\{Factories\HasFactory,
     Model,
-    Relations\BelongsTo
-};
+    Relations\BelongsTo};
 
+/**
+ * TagsTranslation is a model class for tags_translation table.
+ */
 class TagsTranslation extends Model
 {
     use HasFactory;
@@ -26,6 +31,11 @@ class TagsTranslation extends Model
      */
     protected $fillable = ['title'];
 
+    /**
+     * Relation with Tags model.
+     *
+     * @return BelongsTo
+     */
     public function tags(): BelongsTo
     {
         return $this->belongsTo(Tags::class);
