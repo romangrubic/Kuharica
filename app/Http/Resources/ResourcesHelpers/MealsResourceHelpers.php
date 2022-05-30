@@ -19,11 +19,11 @@ class MealsResourceHelpers
     /**
      * Sets 'status' key with correct status type (created|modified|deleted)
      *
-     * @param string $param
+     * @param string|null $param
      * @param Meals $resource
      * @return string
      */
-    public static function helperStatus(string $param, Meals $resource): string
+    public static function helperStatus($param, Meals $resource): string
     {
         if (!isset($param)) {
             return 'created';
