@@ -94,11 +94,11 @@ class Meals extends Model
      * @param array $parameters
      * @return LengthAwarePaginator
      */
-    public static function readMeals(array $parameters): LengthAwarePaginator
+    public function readMeals(array $parameters): LengthAwarePaginator
     {
             return Meals::select('*')
                 /**
-                 * 'category' - INT greater than 0, NULL or !NULL (case-sensitive, no leading zeroes)
+                 * 'category' - INT greater than 0 or NULL or !NULL (case-sensitive, no leading zeroes)
                  */
                 ->when(isset($parameters['category']), function ($query) use ($parameters) {
                     switch ($parameters['category']) {

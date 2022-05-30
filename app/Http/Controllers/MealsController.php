@@ -51,7 +51,7 @@ class MealsController extends Controller
         /**
          * Query (Meals::readMeals in Models\Meals.php) is sent with those parameters.
          */
-        $data = $this->meals::readMeals($parameters);
+        $data = $this->meals->readMeals($parameters);
 
         /**
          * Result is passed to MealsCollection (MealsCollection.php and MealsResource.php) for formatting data.
@@ -62,7 +62,7 @@ class MealsController extends Controller
         /**
          * Or in one line
          *
-         * return response()->json(new MealsCollection($this->meals::readMeals($this->request->validated())));
+         * return response()->json(new MealsCollection($this->meals->readMeals($this->request->validated())));
          */
     }
 }

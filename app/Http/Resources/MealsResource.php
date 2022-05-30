@@ -3,12 +3,16 @@
 /**
  * This file contains formatting instructions for data (meals items).
  */
+
 namespace App\Http\Resources;
 
 use App\Http\Requests\MealsGetRequest;
 use App\Http\Resources\ResourcesHelpers\MealsResourceHelpers;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * MealsResource is a class for formatting meal(s).
+ */
 class MealsResource extends JsonResource
 {
     /**

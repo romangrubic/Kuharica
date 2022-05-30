@@ -3,6 +3,7 @@
 /**
  * This file contains formatting instructions for /api/meals route data.
  */
+
 namespace App\Http\Resources;
 
 use App\Http\Requests\MealsGetRequest;
