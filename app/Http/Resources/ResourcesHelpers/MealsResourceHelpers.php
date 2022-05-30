@@ -43,12 +43,12 @@ class MealsResourceHelpers
     /**
      * Sets 'category' key with category data
      *
-     * @param string $param
+     * @param string|null $param
      * @param Meals $resource
      * @return array|mixed
      * if I write type array|mixed next to function, it throws a syntax error because of |
      */
-    public static function helperCategory(string $param, Meals $resource)
+    public static function helperCategory($param, Meals $resource)
     {
         if (!in_array('category', explode(',', $param))) {
             return $resource['category_id'];

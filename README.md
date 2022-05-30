@@ -1,64 +1,318 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# About Kuharica
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+With 'Kuharica' you can find easy recipes to make at home.
 
-## About Laravel
+- Simple API with one endpoint
+- Search for specific recipes based on many number of parameters
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Any issues, send PM and I'll sort it out.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
+## Summary
+* [Base URL](#base-url)
+  * [Required GET parameters](#required-get-parameters)
+  * [Optional GET parameters](#optional-get-parameters)
+* [Response example](#response-example)
+  * [Base URL response](#example-for-base-url-response)
+  * [Custom URL response](#example-for-custom-url-response)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Base URL
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Base route looks like this
 
-## Laravel Sponsors
+> localhost/api/meals?lang=en  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+And can be complex as this
 
-### Premium Partners
+> localhost/api/meals?lang=en&per_page=5&with=ingredients,category,tags&page=1&tags=2,175
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Required GET parameters:
+- lang 
+  - String of 2 characters only (char(2))
+  - Selects language of data 
+  - Options: 
+    1. English (English) - 'en'
+    2. Croatian (Hrvatski) - 'hr'
+    3. German (Deutsch) - 'de'
+    4. Italian (Italiana) - 'it'
+    5. Spanish (Española) - 'es'
+    > localhost/api/meals?lang=en
 
-## Contributing
+### Optional GET parameters:
+- per_page
+  - INT (greater than 0)
+  - Anything else resets url back to base url
+  - Default value is 5
+  - Determines how many meals are shown per page
+    > localhost/api/meals?lang=en&per_page=10
+    
+- page
+  - INT (greater than 0) 
+  - Anything else resets url back to base url
+  - Default value is 1 (default per_page is 5)
+  - Determines which page is shown to user
+    > localhost/api/meals?lang=en&page=3
+    
+- category
+  - INT (greater than zero) | NULL | !NULL (case-sensitive)
+  - Anything else resets url back to base url
+  - Selects meals that have requested category
+    - NULL shows all meals that don't have category
+    - !NULL shows all meals that have a category (where value is not null)
+    - INT shows meals with selected category
+    > localhost/api/meals?lang=en&category=!NULL
+    
+- tags
+  - String of integers with comma separation (no space after comma and no trailing comma)
+  - Anything else resets url back to base url
+  - Selects meals that have all tags required (no partial, all of them)
+    > localhost/api/meals?lang=en&tags=23,176
+  
+- with
+  - String of with up to three times (category|tags|ingredients) with comma separation (no space after comma)
+  - Anything else resets url back to base url
+  - Selects extra data for selected
+    - category - shows extra data such as title and slug
+    - tags - shows extra data such as id, title and slug
+    - ingredients - shows extra data such as id, title and slug
+    > localhost/api/meals?lang=en&with=category,tags,ingredients
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- diff_time
+  - UNIX timestamp (integer greater than 0)
+  - Anything else resets url back to base url 
+  - Returns all meals that have been modified (including deleted) after the UNIX timestamp
+  - Shows current status of the meal (create|modified|deleted)
+    > localhost/api/meals?lang=en&diff_time=1234567890
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Response example
 
-## Security Vulnerabilities
+### Example for base url response
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> localhost/api/meals?lang=en
 
-## License
+```yaml
+{
+    "meta": {
+        "current_page": 1,
+        "totalItems": 590,
+        "itemsPerPage": 10,
+        "totalPages": 59
+    },
+    "data": [
+        {
+            "id": 3,
+            "title": "Jezik: en - Naslov jela - 3 Omnis in porro sit.",
+            "description": "Jezik: en - Opis jela -3 Ad a quibusdam exercitationem omnis dolores quam. Non quia sunt laborum sed accusamus.",
+            "status": "created",
+            "category": 17
+        },
+        {
+            "id": 4,
+            "title": "Jezik: en - Naslov jela - 4 Est ut omnis nulla et sit.",
+            "description": "Jezik: en - Opis jela -4 Est eos quibusdam molestiae ducimus. Rerum inventore ratione et officiis nemo quos.",
+            "status": "created",
+            "category": 8
+        },
+        {
+            "id": 5,
+            "title": "Jezik: en - Naslov jela - 5 Doloremque ullam qui qui voluptas placeat.",
+            "description": "Jezik: en - Opis jela -5 Porro qui ratione voluptatibus natus. Quo beatae enim ut praesentium. Ut aut ut maxime.",
+            "status": "created",
+            "category": 14
+        },
+        {
+            "id": 6,
+            "title": "Jezik: en - Naslov jela - 6 Animi nihil perspiciatis neque nisi.",
+            "description": "Jezik: en - Opis jela -6 Omnis eos id illum perspiciatis culpa earum. Sapiente dolorem ut et.",
+            "status": "created",
+            "category": null
+        },
+        {
+            "id": 7,
+            "title": "Jezik: en - Naslov jela - 7 Sequi aut quos qui nisi et in voluptatem.",
+            "description": "Jezik: en - Opis jela -7 Hic vel mollitia sequi qui aut. Et error ut illum. Quia qui inventore sit.",
+            "status": "created",
+            "category": 9
+        },
+        {
+            "id": 8,
+            "title": "Jezik: en - Naslov jela - 8 Iure enim ut qui ex quia aut quo.",
+            "description": "Jezik: en - Opis jela -8 A distinctio numquam cum in. Dolorem aut in qui et eaque. Eos optio odit sit quidem.",
+            "status": "created",
+            "category": 15
+        },
+        {
+            "id": 9,
+            "title": "Jezik: en - Naslov jela - 9 Maxime sint tempora et rem et voluptas quidem.",
+            "description": "Jezik: en - Opis jela -9 Culpa dolores alias modi illum quia praesentium. Est et accusamus nihil dolor inventore eligendi.",
+            "status": "created",
+            "category": 2
+        },
+        {
+            "id": 10,
+            "title": "Jezik: en - Naslov jela - 10 Veritatis ab error consectetur id ut.",
+            "description": "Jezik: en - Opis jela -10 Deleniti et ut voluptatum et alias. Ipsa sed aut aut quod dolor.",
+            "status": "created",
+            "category": 17
+        },
+        {
+            "id": 11,
+            "title": "Jezik: en - Naslov jela - 11 Voluptatem ut illum beatae non.",
+            "description": "Jezik: en - Opis jela -11 Dolores officiis iure iusto. Aut sunt molestiae corporis consequatur.",
+            "status": "created",
+            "category": 16
+        },
+        {
+            "id": 12,
+            "title": "Jezik: en - Naslov jela - 12 Libero sit consequatur dolore dolorum.",
+            "description": "Jezik: en - Opis jela -12 Explicabo aut illo laudantium voluptatem. Ex autem vel ea. Voluptatem nihil quis ut consectetur.",
+            "status": "created",
+            "category": 9
+        }
+    ],
+    "links": {
+        "prev": null,
+        "next": "http://127.0.0.1:8000/api/meals?page=2&lang=en",
+        "self": "http://127.0.0.1:8000/api/meals?page=1&lang=en"
+    }
+}
+```
+### Example for custom url response
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+> localhost/api/meals?per_page=5&tags=2&lang=hr&with=ingredients,category,tags&diff_time=1493902343&page=2
+
+```yaml
+{
+    "meta": {
+        "current_page": 2,
+        "totalItems": 8,
+        "itemsPerPage": 5,
+        "totalPages": 2
+        },
+    "data": [
+        {
+            "id": 387,
+            "title": "Jezik: hr - Naslov jela - 387 Et vero alias quis rerum.",
+            "description": "Jezik: hr - Opis jela -387 Velit laborum aut ratione. Hic quo sed amet consequatur. Recusandae at molestias sit ut.",
+            "status": "created",
+            "category": {
+                "id": 12,
+                "title": "Jezik: hr - Naslov kategorije - 12 Amet ipsa amet impedit sunt. Minus velit sit sunt esse vel aspernatur.",
+                "slug": "category-12"
+            },
+            "tags": [
+                {
+                    "id": 2,
+                    "title": "Jezik: hr - Naslov sastojka - 2 Iste voluptas ut maiores beatae voluptatem. Voluptatem rerum enim expedita omnis eligendi corrupti.",
+                    "slug": "tag-2"
+                }
+            ],
+            "ingredients": [
+                {
+                    "id": 94,
+                    "title": "Jezik: hr - Naslov sastojka - 94 Culpa eum tenetur quis magnam. Quibusdam qui quae quia exercitationem mollitia aut.",
+                    "slug": "sastojak-94"
+                },
+                {
+                    "id": 5,
+                    "title": "Jezik: hr - Naslov sastojka - 5 Sint minus in sed quia quia alias ratione. Magni voluptas fugit quia velit deleniti magni aut.",
+                    "slug": "sastojak-5"
+                },
+                {
+                    "id": 86,
+                    "title": "Jezik: hr - Naslov sastojka - 86 Qui sint sit cumque ipsa est. Adipisci qui omnis et consequatur. Corrupti soluta incidunt labore.",
+                    "slug": "sastojak-86"
+                },
+                {
+                    "id": 24,
+                    "title": "Jezik: hr - Naslov sastojka - 24 Voluptatem eaque ut quia nam unde. Non porro assumenda eum odio id eius qui.",
+                    "slug": "sastojak-24"
+                },
+                {
+                    "id": 68,
+                    "title": "Jezik: hr - Naslov sastojka - 68 Id cum reprehenderit sed aut. Ut commodi et a sapiente eum.",
+                    "slug": "sastojak-68"
+                }
+            ]
+        },
+        {
+            "id": 535,
+            "title": "Jezik: hr - Naslov jela - 535 Eius ut rem doloribus saepe animi eum ipsam.",
+            "description": "Jezik: hr - Opis jela -535 Culpa et odio quo omnis et earum repellat a. Quia enim rem nemo ducimus. Quis tempore quisquam est.",
+            "status": "created",
+            "category": {
+                "id": 16,
+                "title": "Jezik: hr - Naslov kategorije - 16 Fuga illum et autem eius. Vero exercitationem sapiente voluptatem aliquam.",
+                "slug": "category-16"
+                },
+            "tags": [
+                {
+                    "id": 2,
+                    "title": "Jezik: hr - Naslov sastojka - 2 Iste voluptas ut maiores beatae voluptatem. Voluptatem rerum enim expedita omnis eligendi corrupti.",
+                    "slug": "tag-2"
+                },
+                {
+                    "id": 96,
+                    "title": "Jezik: hr - Naslov sastojka - 96 Repudiandae molestias pariatur dolor et. Quibusdam esse similique autem omnis velit.",
+                    "slug": "tag-96"
+                }
+            ],
+            "ingredients": [
+                {
+                    "id": 19,
+                    "title": "Jezik: hr - Naslov sastojka - 19 Ipsa eligendi est voluptatem vitae. Atque earum sint delectus consequatur qui vero.",
+                    "slug": "sastojak-19"
+                }
+            ]
+        },
+        {
+        "id": 575,
+        "title": "Jezik: hr - Naslov jela - 575 Possimus odit ex eveniet deserunt.",
+        "description": "Jezik: hr - Opis jela -575 Ipsam earum qui aut amet nemo. Quam iure ducimus ratione rem. Natus quae quod temporibus quaerat.",
+        "status": "created",
+        "category": {
+                "id": 17,
+                "title": "Jezik: hr - Naslov kategorije - 17 Labore quo sit quos mollitia. Nihil ab dolor sed et ullam at.",
+                "slug": "category-17"
+            },
+        "tags": [
+            {
+                "id": 187,
+                "title": "Jezik: hr - Naslov sastojka - 187 Aliquam vitae ab voluptatibus nihil suscipit et aliquam. Exercitationem quidem ut in nesciunt.",
+                "slug": "tag-187"
+            },
+            {
+                "id": 169,
+                "title": "Jezik: hr - Naslov sastojka - 169 Eum iure illum incidunt ducimus aut. Et vel repellat sit ea enim velit.",
+                "slug": "tag-169"
+            },
+            {
+                "id": 157,
+                "title": "Jezik: hr - Naslov sastojka - 157 Et et vero neque soluta modi assumenda. Ad tempora ut sunt eligendi voluptas expedita reiciendis.",
+                "slug": "tag-157"
+            },
+            {
+                "id": 2,
+                "title": "Jezik: hr - Naslov sastojka - 2 Iste voluptas ut maiores beatae voluptatem. Voluptatem rerum enim expedita omnis eligendi corrupti.",
+                "slug": "tag-2"
+            }
+        ],
+        "ingredients": [
+            {
+                "id": 51,
+                "title": "Jezik: hr - Naslov sastojka - 51 Culpa dolorem libero facilis repellendus vitae mollitia rerum. Est dolores mollitia est.",
+                "slug": "sastojak-51"
+            }
+            ]
+        }
+    ],
+    "links": {
+        "prev": "http://127.0.0.1:8000/api/meals?page=1&per_page=5&tags=2&lang=hr&with=ingredients,category,tags&diff_time=1493902343",
+        "next": null,
+        "self": "http://127.0.0.1:8000/api/meals?page=2&per_page=5&tags=2&lang=hr&with=ingredients,category,tags&diff_time=1493902343"
+    }
+}
+```
