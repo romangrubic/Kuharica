@@ -19,5 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Route for meals request
+/**
+ * Main route for API
+ */
 Route::get('meals', [MealsController::class, 'index']);

@@ -1,11 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+/**
+ * This file contains form request for route /api/meals.
+ */
 
+namespace App\Http\Requests;
 
 use App\Rules\LanguageRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * MealsGetRequest is a FormRequest class for route /api/meals.
+ */
 class MealsGetRequest extends FormRequest
 {
     /**
@@ -25,10 +31,20 @@ class MealsGetRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * If one of the parameters is not correct, user is redirected to start with lang='en'.
+         */
         $this->redirect = 'api/meals?lang=en';
 
+        /**
+         * 'per_page' & 'page' - https://laravel.com/docs/9.x/validation#rule-integer combine with numeric
+         * 'category' - No leading 0 or 0 (only choice is int greater than 0, NULL and !NULL (case sensitive))
+         * 'tags' - String with numbers only with comma separator between (no comma after last number)
+         * 'with' - One of those words (category|tags|ingredients) repeated 1-3 times with comma separation
+         * 'lang' - special rule that checks if value exists in languages table
+         * 'diff_time' - UNIX timestamp greater than 0
+         */
         return [
-//            https://laravel.com/docs/9.x/validation#rule-integer combine with numeric
             'per_page' => [
                 'integer',
                 'numeric',
@@ -39,24 +55,21 @@ class MealsGetRequest extends FormRequest
                 'numeric',
                 'min:1'
             ],
-//            No leading 0 or just 0
             'category' => [
                 'regex:/^(?:[1-9][0-9]*|NULL|!NULL)$/'
             ],
-//            String with numbers only with comma separator between (no comma after last number)
             'tags' => [
                 'regex:/^\d+(?:,\d+)*$/'
             ],
             'with' => [
-//                One of those words repeated 1-3 times with comma separation (no space after)
-                'regex:/^(tags|ingredients|category)(?:,(tags|ingredients|category)){0,2}$/'
+                'regex:/^((tags|ingredients|category)+,?){1,3}$/'
             ],
             'lang'  => [
                 'required',
                 new LanguageRule()
             ],
             'diff_time' => [
-                'regex:/^\d{10}$/'
+                'regex:/^\d+$/'
             ]
         ];
     }
@@ -70,7 +83,7 @@ class MealsGetRequest extends FormRequest
     {
         $this->merge([
             'per_page' => $this->per_page ?? 10,
-            'page' => $this->page ?? 1,
+            'page' => $this->page ?? 1
         ]);
     }
 
@@ -82,8 +95,6 @@ class MealsGetRequest extends FormRequest
     public function messages(): array
     {
         return [
-//            'per_page.integer' => 'A title is required',
-//            'body.required' => 'A message is required',
         ];
     }
 }

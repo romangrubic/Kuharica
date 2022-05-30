@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Categories;
-use App\Models\Languages;
+use App\Models\{Categories,
+    Languages};
 use Faker\Generator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Categories;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
