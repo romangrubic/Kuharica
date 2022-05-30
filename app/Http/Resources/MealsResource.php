@@ -62,8 +62,9 @@ class MealsResource extends JsonResource
      *
      * @param string $param
      * @return array|mixed
+     * if I write type array|mixed next to function, it throws a syntax error because of |
      */
-    private function helperCategory(string $param): mixed
+    private function helperCategory(string $param)
     {
         if (!in_array('category', explode(',', $param))) {
             return $this->resource['category_id'];
@@ -86,7 +87,7 @@ class MealsResource extends JsonResource
      * @param Request $request
      * @param string $key
      * @return array|bool
-     * if I write type array|bool next to function, it throws a syntax error
+     * if I write type array|mixed next to function, it throws a syntax error because of |
      */
     private function helperWithData(Request $request, string $key)
     {
