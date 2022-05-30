@@ -97,6 +97,9 @@ class Meals extends Model
     public static function readMeals(array $parameters): LengthAwarePaginator
     {
             return Meals::select('*')
+                /**
+                 * 'category' - INT greater than 0, NULL or !NULL (case-sensitive, no leading zeroes)
+                 */
                 ->when(isset($parameters['category']), function ($query) use ($parameters) {
                     switch ($parameters['category']) {
                         case('NULL'):
@@ -110,6 +113,9 @@ class Meals extends Model
                             break;
                     }
                 })
+                /**
+                 * 'tags' - string of comma separated integers greater than 0 (1,2,33). Any number of integers.
+                 */
                 ->when(isset($parameters['tags']), function ($query) use ($parameters) {
                     $requestedTagIds = explode(',', $parameters['tags']);
                     return $query->whereHas(
@@ -119,9 +125,17 @@ class Meals extends Model
                         count($requestedTagIds)
                     );
                 })
+                /**
+                 * 'with' - string combination of (category|tags|ingredients) with comma separation.
+                 *        - Max 3 repetitions (min 1). Can have trailing comma.
+                 */
                 ->when(isset($parameters['with']), function ($query) use ($parameters) {
-                    $query->with(explode(',', $parameters['with']));
+                    $with = array_filter(explode(',', $parameters['with']));
+                    $query->with($with);
                 })
+                /**
+                 *  'diff_time - UNIX timestamp greater than 0.
+                 */
                 ->when(isset($parameters['diff_time']), function ($query) use ($parameters) {
                     $timestamp = Carbon::createFromTimestamp($parameters['diff_time']);
                     $query->where('meals.updated_at', '>=', $timestamp)
